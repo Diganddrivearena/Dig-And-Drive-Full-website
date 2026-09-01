@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Pencil, Trash2, ImageIcon } from "lucide-react";
+import { AdminTableSkeleton } from "@/components/admin/AdminLoader";
 import { api, type ApiProduct } from "@/lib/api";
 import { imageFor, productImageKeys } from "@/lib/images";
 import { toast } from "sonner";
@@ -476,7 +477,7 @@ export function AdminProductsPage() {
       </form>
 
       {isLoading ? (
-        <p>Loading…</p>
+        <AdminTableSkeleton rows={8} />
       ) : (
         <div className="rounded-xl border border-border bg-white overflow-x-auto">
           <DndContext

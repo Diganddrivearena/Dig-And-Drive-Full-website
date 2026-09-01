@@ -141,7 +141,7 @@ export function RotatingPromoBanner() {
             <button
               type="button"
               onClick={() => go(-1)}
-              className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors"
+              className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -149,7 +149,7 @@ export function RotatingPromoBanner() {
             <button
               type="button"
               onClick={() => go(1)}
-              className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors"
+              className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
               aria-label="Next slide"
             >
               <ChevronRight className="h-5 w-5" />
@@ -160,7 +160,7 @@ export function RotatingPromoBanner() {
                   key={s.id}
                   type="button"
                   onClick={() => setIndex(i)}
-                  className={`h-2 rounded-full transition-all ${
+                  className={`h-2 rounded-full transition-all cursor-pointer ${
                     i === index ? "w-8 bg-brand-yellow" : "w-2 bg-white/40 hover:bg-white/70"
                   }`}
                   aria-label={`Go to slide ${i + 1}`}

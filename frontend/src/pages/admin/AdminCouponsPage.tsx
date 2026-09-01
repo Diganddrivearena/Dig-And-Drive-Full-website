@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { AdminTableSkeleton } from "@/components/admin/AdminLoader";
 import { api, type ApiCoupon } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -153,7 +154,7 @@ export function AdminCouponsPage() {
       </form>
 
       {isLoading ? (
-        <p>Loading…</p>
+        <AdminTableSkeleton rows={5} />
       ) : (
         <div className="rounded-xl border border-border bg-white overflow-x-auto">
           <table className="w-full text-sm">

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { AdminDashboardSkeleton } from "@/components/admin/AdminLoader";
 import { api } from "@/lib/api";
 
 export function AdminDashboardPage() {
@@ -24,6 +25,13 @@ export function AdminDashboardPage() {
     queryFn: () => api<unknown[]>("/admin/users"),
   });
 
+  const isLoading =
+    products.isLoading ||
+    coupons.isLoading ||
+    banners.isLoading ||
+    orders.isLoading ||
+    users.isLoading;
+
   const cards = [
     { label: "Products", count: products.data?.length ?? "—", to: "/admin/products" },
     { label: "Orders", count: orders.data?.length ?? "—", to: "/admin/orders" },
@@ -35,18 +43,22 @@ export function AdminDashboardPage() {
   return (
     <div>
       <h1 className="font-display text-3xl text-brand-black mb-6">Overview</h1>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {cards.map((c) => (
-          <Link
-            key={c.to}
-            to={c.to}
-            className="rounded-xl border border-border bg-white p-5 hover:border-brand-orange transition-colors"
-          >
-            <div className="text-sm text-muted-foreground uppercase tracking-wide">{c.label}</div>
-            <div className="font-display text-4xl mt-2">{c.count}</div>
-          </Link>
-        ))}
-      </div>
+      {isLoading ? (
+        <AdminDashboardSkeleton />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {cards.map((c) => (
+            <Link
+              key={c.to}
+              to={c.to}
+              className="rounded-xl border border-border bg-white p-5 hover:border-brand-orange transition-colors"
+            >
+              <div className="text-sm text-muted-foreground uppercase tracking-wide">{c.label}</div>
+              <div className="font-display text-4xl mt-2">{c.count}</div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

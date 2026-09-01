@@ -1,5 +1,6 @@
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { AdminLoader } from "@/components/admin/AdminLoader";
 import { LayoutDashboard, Package, Ticket, Image, LogOut, ShoppingBag, Users } from "lucide-react";
 
 const NAV = [
@@ -17,8 +18,8 @@ export function AdminLayout() {
 
   if (isPending) {
     return (
-      <div className="min-h-screen grid place-items-center bg-brand-gray">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-t-transparent" />
+      <div className="min-h-screen bg-brand-gray">
+        <AdminLoader fullPage label="Checking admin access…" />
       </div>
     );
   }

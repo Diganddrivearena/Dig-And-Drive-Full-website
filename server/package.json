@@ -6,7 +6,8 @@
     "dev": "tsx watch --env-file=.env src/index.ts",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx --env-file=.env seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "fast2sms:status": "tsx --env-file=.env scripts/fast2sms-status.ts"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",

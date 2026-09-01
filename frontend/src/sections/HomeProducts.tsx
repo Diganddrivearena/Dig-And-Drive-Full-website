@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useCatalog";
 import type { ApiProduct } from "@/lib/api";
@@ -108,6 +109,7 @@ export function HomeProducts() {
             className="btn-yellow px-10 py-4 text-lg"
           >
             Show More Products
+            <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </div>

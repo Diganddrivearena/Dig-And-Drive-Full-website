@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { AdminLoader } from "@/components/admin/AdminLoader";
 import { api } from "@/lib/api";
 import { imageFor, placeholderImg } from "@/lib/images";
 
@@ -43,7 +44,7 @@ export function AdminOrdersPage() {
     <div className="space-y-6">
       <h1 className="font-display text-3xl">Orders</h1>
       {isLoading ? (
-        <p>Loading…</p>
+        <AdminLoader label="Loading orders…" />
       ) : data.length === 0 ? (
         <p className="text-muted-foreground">No orders yet.</p>
       ) : (

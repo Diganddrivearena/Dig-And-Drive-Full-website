@@ -123,7 +123,7 @@ export function Header() {
                   </span>
                   <button
                     onClick={() => signOut()}
-                    className="p-2 text-brand-black hover:text-brand-orange"
+                    className="p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer"
                     aria-label="Sign out"
                     title={user.email}
                   >
@@ -134,13 +134,13 @@ export function Header() {
                 <div className="hidden sm:flex items-center gap-2">
                   <button
                     onClick={() => navigate("/login")}
-                    className="rounded-md border-2 border-brand-black px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-black hover:bg-brand-black hover:text-white transition-colors"
+                    className="btn-dark text-xs py-1.5 px-3 normal-case tracking-wide"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => navigate("/login?mode=register")}
-                    className="rounded-md bg-brand-orange px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-black transition-colors"
+                    className="rounded-md bg-brand-orange px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-black transition-colors cursor-pointer"
                   >
                     Register
                   </button>
@@ -149,7 +149,7 @@ export function Header() {
 
             <a
               href={`tel:${SITE.phoneRaw}`}
-              className="hidden xl:inline-flex items-center gap-2 rounded-md border-2 border-brand-black px-3 py-2 text-sm font-bold text-brand-black hover:bg-brand-black hover:text-white transition-colors"
+              className="btn-dark hidden xl:inline-flex text-sm normal-case tracking-normal py-2 px-3"
             >
               <Phone className="h-4 w-4" /> Call
             </a>
@@ -164,7 +164,7 @@ export function Header() {
             </a>
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden p-2 text-brand-black"
+              className="lg:hidden p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer"
               aria-label="Toggle menu"
             >
               {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -190,7 +190,7 @@ export function Header() {
               {!user && (
                 <div className="flex gap-2 py-3">
                   <button
-                    className="flex-1 rounded-md border-2 border-brand-black py-2 text-xs font-bold uppercase"
+                    className="btn-dark flex-1 text-xs py-2 normal-case tracking-wide"
                     onClick={() => {
                       setOpen(false);
                       navigate("/login");
@@ -199,7 +199,7 @@ export function Header() {
                     Login
                   </button>
                   <button
-                    className="flex-1 rounded-md bg-brand-orange py-2 text-xs font-bold uppercase text-white"
+                    className="flex-1 rounded-md bg-brand-orange py-2 text-xs font-bold uppercase text-white hover:bg-brand-black transition-colors cursor-pointer"
                     onClick={() => {
                       setOpen(false);
                       navigate("/login?mode=register");

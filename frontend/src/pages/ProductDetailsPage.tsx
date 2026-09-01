@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Check, ShieldCheck, Truck, RotateCcw } from "lucide-react";
+import { ArrowLeft, Check, ShieldCheck, Truck, RotateCcw, ShoppingBag } from "lucide-react";
 import { imageFor, getExtraImages } from "@/lib/images";
 import { productWaMessage, waLink } from "@/lib/site";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
@@ -253,8 +253,9 @@ export function ProductDetailsPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => addToCart(product)}
-                  className="btn-yellow flex-1 py-4 text-base justify-center cursor-pointer"
+                  className="btn-yellow flex-1 py-4 text-base justify-center"
                 >
+                  <ShoppingBag className="h-5 w-5" />
                   Add to Cart
                 </button>
                 <a

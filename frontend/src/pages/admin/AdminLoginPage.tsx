@@ -1,6 +1,9 @@
 import { FormEvent, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { AdminLoader } from "@/components/admin/AdminLoader";
+import { GoogleIcon } from "@/components/GoogleIcon";
 import { useAuth } from "@/context/AuthContext";
 
 export function AdminLoginPage() {
@@ -12,6 +15,7 @@ export function AdminLoginPage() {
     signInWithEmail,
   } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const from = (location.state as { from?: string } | null)?.from || "/admin";
 
   const [email, setEmail] = useState("");
@@ -20,8 +24,8 @@ export function AdminLoginPage() {
 
   if (isPending) {
     return (
-      <div className="min-h-screen grid place-items-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-orange border-t-transparent" />
+      <div className="min-h-screen bg-brand-gray">
+        <AdminLoader fullPage label="Loading admin login…" />
       </div>
     );
   }
@@ -50,6 +54,7 @@ export function AdminLoginPage() {
     try {
       await signInWithEmail(email, password);
       toast.success("Logged in");
+      navigate(from, { replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -85,8 +90,22 @@ export function AdminLoginPage() {
             minLength={8}
             required
           />
-          <button type="submit" className="btn-yellow w-full justify-center" disabled={submitting}>
-            {submitting ? "Please wait…" : "Login"}
+          <button
+            type="submit"
+            className="btn-yellow w-full justify-center"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand-black/20 border-t-brand-black" />
+                Please wait…
+              </span>
+            ) : (
+              <>
+                <LogIn className="h-4 w-4" />
+                Login
+              </>
+            )}
           </button>
         </form>
 
@@ -98,11 +117,19 @@ export function AdminLoginPage() {
 
         <button
           type="button"
-          className="w-full rounded-lg border-2 border-brand-black px-4 py-2.5 text-sm font-bold hover:bg-brand-black hover:text-white transition-colors"
-          onClick={() => signInWithGoogle("/admin")}
+          className="btn-dark w-full text-sm normal-case tracking-normal py-2.5"
+          onClick={() => signInWithGoogle(from)}
         >
+          <GoogleIcon />
           Continue with Google
         </button>
+
+        <Link
+          to="/"
+          className="mt-6 block text-center text-xs uppercase tracking-wider text-muted-foreground hover:text-brand-black transition-colors cursor-pointer"
+        >
+          Back to home
+        </Link>
       </div>
     </div>
   );

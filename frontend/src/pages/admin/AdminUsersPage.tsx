@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Users } from "lucide-react";
+import { AdminTableSkeleton } from "@/components/admin/AdminLoader";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -45,7 +46,7 @@ export function AdminUsersPage() {
       </div>
 
       {isLoading ? (
-        <p>Loading…</p>
+        <AdminTableSkeleton rows={6} />
       ) : data.length === 0 ? (
         <div className="rounded-xl border border-border bg-white p-10 text-center text-muted-foreground">
           <Users className="h-10 w-10 mx-auto mb-3 opacity-40" />

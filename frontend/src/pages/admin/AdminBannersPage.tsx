@@ -24,6 +24,7 @@ import {
   ImageIcon,
   Upload,
 } from "lucide-react";
+import { AdminCardGridSkeleton } from "@/components/admin/AdminLoader";
 import { api, uploadBannerImage, type ApiBannerAdmin } from "@/lib/api";
 import { imageFor, productImages, placeholderImg } from "@/lib/images";
 import { toast } from "sonner";
@@ -406,7 +407,7 @@ export function AdminBannersPage() {
       </form>
 
       {isLoading ? (
-        <p>Loading…</p>
+        <AdminCardGridSkeleton cards={4} />
       ) : (
         <DndContext
           sensors={sensors}
