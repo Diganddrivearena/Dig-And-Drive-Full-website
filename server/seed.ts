@@ -27,10 +27,10 @@ type CategoryJson = {
 };
 
 const productsJson = JSON.parse(
-  readFileSync(resolve("src/data/products.json"), "utf8"),
+  readFileSync(resolve("../frontend/src/data/products.json"), "utf8"),
 ) as ProductJson[];
 const categoriesJson = JSON.parse(
-  readFileSync(resolve("src/data/categories.json"), "utf8"),
+  readFileSync(resolve("../frontend/src/data/categories.json"), "utf8"),
 ) as CategoryJson[];
 
 async function main() {

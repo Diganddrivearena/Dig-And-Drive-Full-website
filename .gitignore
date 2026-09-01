@@ -21,7 +21,6 @@ dist-ssr
 public/uploads/banners/*
 !public/uploads/banners/.gitkeep
 
-
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

@@ -343,7 +343,7 @@ adminRoutes.post("/banners/upload", async (c) => {
           ? "gif"
           : "jpg";
   const name = `banner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = resolve(process.cwd(), "public/uploads/banners");
+  const dir = resolve(process.cwd(), "../frontend/public/uploads/banners");
   await mkdir(dir, { recursive: true });
   const bytes = Buffer.from(await file.arrayBuffer());
   await writeFile(join(dir, name), bytes);
