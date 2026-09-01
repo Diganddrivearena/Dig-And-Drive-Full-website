@@ -48,6 +48,19 @@ function buildTrustedOrigins(): string[] {
   return [...origins];
 }
 
+function productionCookieDomain(): string | undefined {
+  try {
+    const url = new URL(process.env.BETTER_AUTH_URL ?? "http://localhost:5173");
+    const host = url.hostname.replace(/^www\./, "");
+    if (host === "localhost" || host.startsWith("127.")) return undefined;
+    return host;
+  } catch {
+    return undefined;
+  }
+}
+
+const cookieDomain = productionCookieDomain();
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -62,6 +75,17 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:5173",
   basePath: "/api/auth",
   trustedOrigins: buildTrustedOrigins(),
+  advanced: {
+    useSecureCookies: true,
+    ...(cookieDomain
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: cookieDomain,
+          },
+        }
+      : {}),
+  },
   socialProviders:
     googleClientId && googleClientSecret
       ? {
