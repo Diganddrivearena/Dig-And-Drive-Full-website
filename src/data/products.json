@@ -1,0 +1,616 @@
+[
+    {
+        "id": 1,
+        "name": "4DRC 48 Quadcopter Dinosaur Drone",
+        "slug": "4drc-48-quadcopter-dinosaur-drone",
+        "price": 2925,
+        "originalPrice": 4925,
+        "category": "Toy Grade Drone Collection",
+        "image": "4drc-drone",
+        "description": "The 4DRC Quadcopter Dinosaur Drone is a fun and eye-catching RC flyer with easy-to-use controls, perfect for kids and beginners.",
+        "specs": [
+            "Dinosaur Design Drone – Unique and attractive look for kids",
+            "Stable Quadcopter Flight – Smooth and balanced flying",
+            "Easy Remote Control – Beginner-friendly operation",
+            "360° Rotation & Flips – Fun stunt features",
+            "LED Lights – Bright and colorful for night flying",
+            "Durable Build – Designed to handle minor crashes",
+            "Headless Mode – Easy navigation for new users"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "2-in-1 Flying Car Drone 1:20 RC Voice Control with Quadcopter",
+        "slug": "2-in-1-flying-car-drone",
+        "price": 2999,
+        "originalPrice": 4630,
+        "category": "Toy Grade Drone Collection",
+        "image": "flying-car-drone",
+        "description": "Epic 2-in-1 Voice Control Flying Car & Stunt Drone transforms from land to air with a single button. Features voice command functionality.",
+        "specs": [
+            "Scale: 1:20",
+            "Channels: 4CH",
+            "Range: 40 meters",
+            "Power: Electric (Rechargeable)",
+            "Material: Durable Plastic",
+            "Age: 6+ Years",
+            "Controller: Normal Batteries",
+            "Flight/Car: Indoor-Outdoor",
+            "Package Includes: 1 × 2-in-1 Flying Car Drone (RTR), Remote Controller, Charger + USB Cable, Batteries, Original Box + Instructions"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "1:14 Mercedes AMG GT3 RS 2 in 1 Transformable RC Car",
+        "slug": "mercedes-amg-gt3-rs-2-in-1",
+        "price": 5999,
+        "originalPrice": 8999,
+        "category": "Trending Gadgets",
+        "image": "mercedes-amg-gt3",
+        "description": "Experience the RASTAR 74800 Mercedes AMG GT3 1:14 RC 2 in 1. Officially licensed transformable remote control car to robot model.",
+        "specs": [
+            "Brand: RASTAR (Model: 74800)",
+            "Scale: 1:14",
+            "Vehicle Type: RC Transformable Sports Car & Robot",
+            "Licensed By: Mercedes-AMG",
+            "Control Frequency: 2.4GHz",
+            "Functions: Forward, Reverse, Left Turn, Right Turn",
+            "Special Functions: One-Key Transformation, Dancing Mode, Robot Mode",
+            "Light & Sound Effects: Headlights & Rear Lights, Built-in Speaker",
+            "Suspension: Independent Suspension System",
+            "Material: ABS Plastic & Electronic Components",
+            "Car Size: 34 × 14.6 × 9.4 cm (Before Transformation)",
+            "Robot Size: 20 × 24.6 × 31.8 cm (After Transformation)",
+            "Power Source: Rechargeable Battery with USB Charging",
+            "Available Colors: Red, Grey, Blue, Yellow",
+            "Recommended Age: 6 Years & Above",
+            "Box Includes: 1 × RASTAR Mercedes AMG GT3 Transformable RC Car, 1 × 2.4GHz Remote Controller, 1 × Rechargeable Battery Pack, 1 × USB Charging Cable, 1 × Shield Accessory, 1 × Shaft Accessory, 1 × Instruction Manual"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Porsche 911 GT2 RS 1:64 Diescast Model",
+        "slug": "porsche-911-gt2-rs-1-64",
+        "price": 499,
+        "originalPrice": 999,
+        "category": "Collector’s Diecast Gallery",
+        "image": "porsche-911-gt2",
+        "description": "Burago 1:64 Porsche 911 GT2 RS Diecast Model with premium detailing and authentic styling for collectors.",
+        "specs": [
+            "Scale: 1:64",
+            "Detailed design for play and display: Features detailed wheels and an authentic racing stripe suitable for both collecting and playing.",
+            "Pros: The diecast car is noted for its impressive level of detail, including emblems and design elements"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Burago 1:64 Ferrari Premium Diecast Model",
+        "slug": "burago-1-64-ferrari",
+        "price": 499,
+        "originalPrice": 999,
+        "category": "Collector’s Diecast Gallery",
+        "image": "burago-ferrari",
+        "description": "Burago 1:64 Burago ENZO Diecast Model with premium detailing. Officially licensed miniature collectible.",
+        "specs": [
+            "Scale: 1:64",
+            "Detailed design for play and display: Features detailed wheels and an authentic racing stripe, suitable for both collecting and playing.",
+            "Pros: The diecast car is noted for its impressive level of detail, including emblems and design elements"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "TRASPED HG4-412 1:64 RC Forklift – App & Remote Control",
+        "slug": "trasped-hg4-412",
+        "price": 1699,
+        "originalPrice": 3299,
+        "category": "Premium RC Construction Models",
+        "image": "trasped-412",
+        "description": "Master warehouse operations with the TRASPED 1:64 Scale RC Forklift. Control via app or remote.",
+        "specs": [
+            "1/64 Scale Realistic Design with simulated driver cockpit",
+            "Startup engine sound + roaring sound (can be turned ON/OFF)",
+            "Adjustable Speed & Lights: Switch speed modes, LED working lights",
+            "One-button demonstration mode",
+            "Functional Forklift System: Comes with fork frame & hook frame, Easy swapping for multiple play styles, Lifts mini loads smoothly",
+            "Dual Control System: Use remote controller or smartphone app",
+            "Stable signal & smooth operation",
+            "Durable Build: Alloy + ABS + electronic components"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Diecast Huina 1611 1:50 Articulated Truck & Excavator Set",
+        "slug": "diecast-huina-1611",
+        "price": 2525,
+        "originalPrice": 4525,
+        "category": "Collector’s Diecast Gallery",
+        "image": "diecast-huina-1611",
+        "description": "Huina 1611 1:50 Articulated Truck & Excavator Set offers collector-grade static display details."
+    },
+    {
+        "id": 8,
+        "name": "TRASPED HG4-413 1:64 RC Excavator – App & Remote Control",
+        "slug": "trasped-hg4-413",
+        "price": 1699,
+        "originalPrice": 3299,
+        "category": "Premium RC Construction Models",
+        "image": "trasped-413",
+        "description": "Realistic mini construction RC model designed for interactive play. Fully controllable via app or included transmitter.",
+        "specs": [
+            "270° Rotating Excavator: Rotating workbench with movable arm and bucket for realistic digging action.",
+            "Full RC Controls: Move forward, backward, turn, rotate, and control the digging arm easily.",
+            "USB Type-C Rechargeable: Convenient Type-C charging for quick and easy recharging.",
+            "Durable Build with Lights: Strong ABS body with realistic tracks, decals, and working lights.",
+            "Perfect Gift for Kids: Great for kids 3+ years, encouraging creativity and role play."
+        ]
+    },
+    {
+        "id": 9,
+        "name": "TRASPED HG4-414 1:64 RC Dump Truck – App & Remote Control",
+        "slug": "trasped-hg4-414",
+        "price": 1699,
+        "originalPrice": 3299,
+        "category": "Premium RC Construction Models",
+        "image": "trasped-414",
+        "description": "The TRASPED HG4-414 1:64 RC Dump Truck offers app and remote-controlled tipping bed functionality in a compact scale.",
+        "specs": [
+            "Scale: 1:64 mini size",
+            "Control: App + Remote operation",
+            "Function: Realistic dump action",
+            "Features: Lights & sound effects",
+            "Build: Durable and detailed design",
+            "Usage: Indoor & outdoor play"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "Huina 1661 1:18 RC Excavator",
+        "slug": "huina-1661-rc-excavator",
+        "price": 3499,
+        "originalPrice": 6999,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1661",
+        "description": "The Huina 1661 1:18 RC Excavator is a detailed construction vehicle with realistic sounds and functional metal tracks.",
+        "specs": [
+            "Scale: 1:18",
+            "Material: Metal + Plastic",
+            "Control Channels: 11CH",
+            "Remote Distance: ~30 m",
+            "Play Time: Approx. 20–30 mins (per charge)",
+            "Charging Time: ~120–180 mins",
+            "Age Range: 5+ years (kids & hobbyists)"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "HUINA 1572 1:14 RC Truck Crane | 15CH Metal Alloy Construction",
+        "slug": "huina-1572-rc-truck-crane",
+        "price": 7999,
+        "originalPrice": 12490,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1572",
+        "description": "Bring construction to life with the HUINA 1572 Remote Control Crawler Crane. 15-channel operation with lifting hook.",
+        "specs": [
+            "Scale: 1:14",
+            "Material: Metal + ABS Plastic",
+            "Play Time: 20 minutes",
+            "Charging Time: 240 minutes",
+            "Control Distance: 25–30 meters",
+            "Rotation Angle: 680°",
+            "Power Supply (Remote): 2× AA Batteries (Not Included)"
+        ]
+    },
+    {
+        "id": 12,
+        "name": "Huina 1501 – 1/18 Scale Officially Authorized RC Trailer Truck",
+        "slug": "huina-1501-rc-trailer-truck",
+        "price": 14490,
+        "originalPrice": 18490,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1501",
+        "description": "The 1501 RC Trailer Truck is a detailed and fully functional 1/18 scale semi-truck transporter.",
+        "specs": [
+            "Model: 1501",
+            "Scale: 1/18",
+            "Weight: 2750 g",
+            "Battery: 7.4V 1200mAh (Included)",
+            "Charging Time: ~4 hours (Uses ~50 minutes)",
+            "Transmitter: 2.4GHz (Requires 4 × AA batteries, not included)",
+            "Control Distance: ~25m",
+            "Truck Size: 39.2 × 16.6 × 24.4 cm",
+            "Functions: Forward/Backward, Turn Left/Right, Tow Hook Open/Close, Servo Trim Adjustments, Support Frame Up/Down, Tailboard Up/Down, Sound On/Off",
+            "Full Lighting System: Headlights, Rear Lights, Auxiliary Lights, Door Lights, Panel Dashboard Lights, All Lights Off Mode",
+            "Package Includes: 1 × 1501 RC Trailer Truck, 1 × 7.4V 1200mAh Battery, 1 × 2.4GHz Remote Controller, 1 × USB Charging Cable, 1 × Screwdriver, 1 × Remote Control Stick, 1 × User Manual"
+        ]
+    },
+    {
+        "id": 13,
+        "name": "HUINA 1318 1:24 SEMI-ALLOY REMOTE CONTROL FLATBED",
+        "slug": "huina-1318-flatbed",
+        "price": 3999,
+        "originalPrice": 5999,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1318",
+        "description": "Manufacturer: Huina Condition: Brand New, Fully Assembled & Painted. Features heavy-duty loading ramps.",
+        "specs": [
+            "Manufacturer: Huina",
+            "Condition: Brand New, Fully Assembled & Painted",
+            "Material: High-quality Plastic",
+            "Scale: 1/18",
+            "Dimensions: Approx. 83 × 10 × 13 cm",
+            "Play Time: Up to 15 minutes",
+            "Charging Time: 1–2 hours",
+            "Control Distance: Up to 25 meters"
+        ]
+    },
+    {
+        "id": 14,
+        "name": "HUINA 1533 RC DUMP TRUCK 1:18 SCALE 9CH REMOTE CONTROL",
+        "slug": "huina-1533-rc-dump-truck",
+        "price": 3999,
+        "originalPrice": 6999,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1533",
+        "description": "Haul massive loads with the Huina 1533 — authentic 1:18 scale RC 9-channel construction dump truck.",
+        "specs": [
+            "Scale: 1:18",
+            "Battery: 7.4V 500mAh (30min runtime)",
+            "Channels: 9CH 2.4GHz",
+            "Dimensions: 28.5 × 15.5 × 16 cm",
+            "Weight: ~2.1kg (packaged)",
+            "Range: 25-30 meters",
+            "Material: Semi-Alloy + Plastic"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "Huina 1579 1:14 RC Forklift Excavator Truck – 2-Way Remote",
+        "slug": "huina-1579-rc-forklift",
+        "price": 5990,
+        "originalPrice": 10990,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1579",
+        "description": "The Huina 1579 is a highly detailed 1:14 scale RC Forklift Excavator hybrid machine with versatile moving parts.",
+        "specs": [
+            "Model Number: Huina 1579",
+            "Scale: 1:14",
+            "Material: Durable ABS Plastic",
+            "Frequency: 2.4 GHz",
+            "Control Channels: 9",
+            "Control Distance: 30–50 m",
+            "Play Time: ~30 mins",
+            "Charging Time: ~240 mins"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "Huina 1553 RC Excavator – 1:16 Scale Remote Control Tractor",
+        "slug": "huina-1553-rc-excavator",
+        "price": 5990,
+        "originalPrice": 8990,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1553",
+        "description": "Bring the thrill of construction sites right into your home with the Huina 1553 hobby-grade remote control tractor.",
+        "specs": [
+            "Brand: Huina Model 1553",
+            "Scale: 1:16",
+            "Control Channels: 4 Channels",
+            "Remote Distance: 30–50m approx.",
+            "Material: Alloy + ABS Plastic",
+            "Color: Gold",
+            "Functions: Digging, forward/backward, left/right turning, rotation"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "HUINA 1552 RC WHEEL LOADER",
+        "slug": "huina-1552-rc-wheel-loader",
+        "price": 4799,
+        "originalPrice": 7499,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1552",
+        "description": "The Huina 1552 RC Loader is a realistic and durable remote-controlled wheel loader for all terrains.",
+        "specs": [
+            "Model Number: Huina 1552",
+            "Scale: 1:16",
+            "Material: Die-cast Metal + ABS Plastic",
+            "Control Channels: 11CH",
+            "Frequency: 2.4 GHz",
+            "Functions: Forward, Backward, Left/Right Turn, Loader Arm Up/Down, Bucket Control, Sound & Light",
+            "Remote Distance: ~30 m"
+        ]
+    },
+    {
+        "id": 18,
+        "name": "Willys Military Jeep 1:10 RC Truck",
+        "slug": "willys-military-jeep",
+        "price": 6500,
+        "originalPrice": 9500,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "willys-jeep",
+        "description": "Storm battlefields with authentic 1:10 scale 4WD Willys Military Jeep ready-to-run crawler blending WWII realism with modern RC performance. Army green icon crushes rocks, sand, and 45° slopes",
+        "specs": [
+            "Scale: 1:10",
+            "Speed: 6-15 km/h",
+            "Battery: 7.4V 500mAh (provides ~40min play time)",
+            "Range: 50-60 meters",
+            "Motor: 280 Brushed Motor",
+            "Servo: 17g Digital Servo",
+            "Weight: ~1kg",
+            "Dimensions: 34.5 × 16 × 17.5 cm",
+            "Package Includes: 1 × JJRC C8815 Willys Military Jeep RC Truck, 1 × 2.4GHz 4CH Remote Controller, 1 × 7.4V 500mAh Li-ion Battery, 1 × USB Charging Cable, 1 × User Manual"
+        ]
+    },
+    {
+        "id": 19,
+        "name": "JJRC 1:18 Mercedes-Benz Unimog 6WD RC Crawler",
+        "slug": "jjrc-mercedes-benz-unimog-6wd",
+        "price": 10999,
+        "originalPrice": 15000,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "jjrc-mercedes",
+        "description": "Experience realistic off-road adventure with the JJRC C8823 1:18 Mercedes-Benz Unimog 6WD RC Crawler a rugged 1:18 scale 6WD RC truck inspired by the legendary Mercedes-Benz Unimog. Designed for superior climbing performance, stable handling, and all-terrain exploration, this high-detail RC crawler combines realistic styling with powerful off-road capability, making it perfect for RC enthusiasts, collectors, and adventure lovers",
+        "specs": [
+            "Brand/Model: JJRC C8823",
+            "Scale/Drive: 1:18 scale 6WD RC Off-Road Crawler",
+            "Motor: High-torque 370 Brushed Motor",
+            "ESC: 20A Waterproof Brushed ESC (Speed Controller: 10A)",
+            "Transmission: Dual-speed gearbox with high/low gear shifting",
+            "Top Speed: Approx. 15 km/h",
+            "Battery: 7.4V 500mAh Li-ion Battery (Included)",
+            "Runtime: Approx. 40 minutes (Charging Time: ~2 hours)",
+            "Control Range: Up to 100 meters (2.4GHz interference-free)",
+            "Chassis: Elevated clearance, wide axle, and retro-style high-grip off-road tires",
+            "Suspension: Upgraded independent suspension for climbing stability",
+            "Protection: Low voltage and ESC overvoltage protection",
+            "Package Includes: 1 × JJRC C8823 RC Truck, 1 × 2.4GHz Remote Controller, 1 × 7.4V Battery, 1 × USB Charging Cable, 1 × User Manual"
+        ]
+    },
+    {
+        "id": 20,
+        "name": "Wltoys XK 12427 1:12 4WD Brushed RC Crawler",
+        "slug": "wltoys-xk-12427",
+        "price": 10999,
+        "originalPrice": 19999,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "wltoys-12427",
+        "description": "Crush trails at 50km/h with the Wltoys 12427 – professional 1:12 scale 4WD brushed crawler built for extreme off-road performance. Full-size 42 × 24.5 × 18cm beast with high-rate battery and European charger. Performance That Dominates: 540 brushed motor + 7.4V 1500mAh high-rate lithium battery delivers 50km/h top speed with 10-minute runtime. 2.4G remote control exceeds 100m range for unrestricted trail exploration. 3-hour charge via 7.4V 500mA European balance charger ensures quick turnaround",
+        "specs": [
+            "Scale: 1:12",
+            "Top Speed: 50 km/h",
+            "Drive System: 4WD",
+            "Battery: 7.4V 1500mAh Lithium Battery (provides ~10min runtime)",
+            "Range: 100+ meters (2.4GHz Control)",
+            "Motor: 540 Brushed Motor",
+            "Dimensions: 42 × 24.5 × 18 cm",
+            "Charger: 7.4V 500mA European Balance Charger",
+            "Package Includes: 1 × Wltoys 12427 RC Crawler Car, 1 × 2.4G Remote Control, 1 × 7.4V 1500mAh Battery, 1 × 7.4V European Balance Charger"
+        ]
+    },
+    {
+        "id": 21,
+        "name": "Wltoys XK 1:18 4WD RC Car",
+        "slug": "wltoys-xk-4wd-car",
+        "price": 6500,
+        "originalPrice": 12500,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "wltoys-4wd-car",
+        "description": "Scale crawling perfection with the Wltoys XK 184021 – authentic 1:18 Power Wagon 4x4 crawler featuring two-speed transmission and portal axles. LED lights and 1-hour low-speed runtime for endless trail adventures. Performance That Dominates: Dual-speed gearbox: 3km/h low gear (1hr runtime) + 9km/h high gear (30min). 130# brushed motor + 7.4V 350mAh Li-ion battery with 60m 2.4GHz range. 1-hour USB charge for all-day crawling sessions. Durable, Crawl-Ready Construction: Portal axle design maximizes ground clearance for rocks and obstacles. Rubber tires + alloy hubs deliver superior grip on all surfaces. 24.3 × 13.9 × 13.8cm (507g) PA+ABS build with realistic LED lighting",
+        "specs": [
+            "Scale: 1:18",
+            "Speeds: 3 km/h (low gear) / 9 km/h (high gear)",
+            "Drive System: 4WD (Power Wagon Crawler)",
+            "Battery: 7.4V 350mAh Li-ion Battery (Included)",
+            "Runtime: ~1 hour in low gear / ~30 minutes in high gear",
+            "Charging Time: ~1 hour (USB charging)",
+            "Range: 60 meters (2.4GHz Control)",
+            "Motor: 130# Brushed Motor",
+            "Dimensions: 24.3 × 13.9 × 13.8 cm",
+            "Weight: 507g",
+            "Chassis features: Portal axle design for max ground clearance, alloy hubs, rubber tires, realistic LED lighting",
+            "Package Includes: 1 × Wltoys XK 184021 RC Power Wagon Crawler, 1 × 2.4GHz Remote Control, 1 × 7.4V 350mAh Li-ion Battery, 1 × USB Charging Cable, 1 × Screwdriver, 1 × User Manual"
+        ]
+    },
+    {
+        "id": 22,
+        "name": "HUINA 1319 1:24 RC FLATBED AND EXCAVATOR",
+        "slug": "huina-1319-flatbed",
+        "price": 6100,
+        "originalPrice": 9100,
+        "category": "Premium RC Construction Models",
+        "image": "huina-1319",
+        "description": "Electronic parameters: 3.7V 500mah JST lithium battery. Functions: forward, backward, turn left, turn right, sound effects on, sound effects off, lights on, lights off, automatic interpretation. Size: 50.5*15.6*35.5. Weight: 2.7 kg",
+        "specs": [
+            "Model: Huina 1319 Tractor Truck with Excavator & Trailer",
+            "Scale: 1:18",
+            "Power Source: Electric",
+            "Battery Type: Lithium (included)",
+            "Control Channels: 9 Channels",
+            "Material: High-quality plastic",
+            "Assembly State: Ready-to-Go"
+        ]
+    },
+    {
+        "id": 23,
+        "name": "Huina 657 Cement Mixer 1:18 Scale RC",
+        "slug": "huina-657-cement-mixer",
+        "price": 3575,
+        "originalPrice": 6175,
+        "category": "Premium RC Construction Models",
+        "image": "huina-657",
+        "description": "Haul and mix simulated concrete with the Huina 657 1:18 scale RC Cement Mixer. Featuring a fully functional rotating drum, realistic sounds, and LED headlights.",
+        "specs": [
+            "Scale: 1:18",
+            "Functional rotating drum",
+            "Realistic sounds and LED headlights"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "Huina 571HD 1:14 15 Channel Construction Car ball",
+        "slug": "huina-571hd-loader",
+        "price": 6600,
+        "originalPrice": 10600,
+        "category": "Premium RC Construction Models",
+        "image": "huina-571hd",
+        "description": "HUINA 1571 571 1:14 15Ch construction car ball grabber loader huina rc excavator with remote control",
+        "specs": [
+            "Model: HUINA 1571 / 571HD",
+            "Scale: 1:14",
+            "Control Channels: 15Ch",
+            "Type: Construction Car Ball Grabber Loader / RC Excavator",
+            "Includes Remote Control"
+        ]
+    },
+    {
+        "id": 25,
+        "name": "Huina 550HD 1:14 scale Toy Grade Excavator",
+        "slug": "huina-550hd-excavator",
+        "price": 6250,
+        "originalPrice": 9250,
+        "category": "Premium RC Construction Models",
+        "image": "huina-550hd",
+        "description": "Take control of the construction site with the Huina 550HD 1:14 scale 15-channel RC Excavator. Built with a durable alloy bucket, metal gears, and multi-directional controls.",
+        "specs": [
+            "Scale: 1:14",
+            "Control Channels: 15-channel RC operation",
+            "Build: Durable alloy bucket and metal gears",
+            "Controls: Multi-directional functionality"
+        ]
+    },
+    {
+        "id": 26,
+        "name": "C6 Mini Cartoon RC Car Camera 2.4 Screen FPV Drift Music Toy",
+        "slug": "c6-mini-cartoon-rc-car-fpv",
+        "price": 2650,
+        "originalPrice": 4650,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "c6-mini-cartoon-rc",
+        "description": "Pocket-sized C6 Mini Cartoon RC Car delivers FPV camera live feed on 2.4-inch controller screen, intelligent follow/drift modes, and music/light effects. 25-minute 3.7V 500mAh runtime perfect for desk racing and video recording",
+        "specs": [
+            "Size: 8 × 12 × 6.5 cm",
+            "Battery: 3.7V 500mAh lithium rechargeable battery (for both Car & Controller)",
+            "Runtime: ~25 minutes per charge",
+            "FPV Camera: HD real-time transmission camera",
+            "Remote Controller: 2.4\" Screen built-in for FPV view",
+            "Interactive Modes: Drift Mode, Follow Mode, Escape Mode, and Music/Sound effects",
+            "Material: Durable ABS Plastic",
+            "Package Includes: 1 × C6 Mini Cartoon RC Car, 1 × 2.4\" Screen Remote Controller, 1 × USB Charging Cable, 1 × Memory Card Reader with Card, 1 × User Manual"
+        ]
+    },
+    {
+        "id": 27,
+        "name": "BMW 1:64 Mini RC Car",
+        "slug": "bmw-mini-rc-car",
+        "price": 1460,
+        "originalPrice": 1960,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "bmw-mini-rc",
+        "description": "BMW 1:64 Mini RC Car is a compact and stylish remote control car designed for smooth indoor driving. Built with detailed BMW styling and durable construction, it delivers fun performance in a mini size. The TRASPED BMW 1:64 Mini RC Car is perfect for kids, collectors, and RC enthusiasts",
+        "specs": [
+            "Scale: 1:64 ultra-mini size",
+            "Design: Detailed and realistic BMW miniature body",
+            "Control: Easy and responsive remote control operation",
+            "Build: Durable and lightweight structure",
+            "Usage: Perfect for indoor fun, desk racing, and miniature collection"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "F1 1:64 Mini RC Car",
+        "slug": "f1-mini-rc-car",
+        "price": 1400,
+        "originalPrice": 1999,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "f1-mini-rc",
+        "description": "Pocket Formula 1 thrills with 1:64 F1 RC Racing Car — ultra-compact alloy die-cast F1 model featuring dual 2.4G remote + APP control. Ready-to-run speed demon perfect for indoor tracks and desk races. Performance That Dominates 4-channel proportional control delivers forward/backward + precise steering",
+        "specs": [
+            "Brand/Model: TRASPED HG4-292",
+            "Scale: 1:64 Mini F1 RC Racing Car",
+            "Control Channels: 4CH Proportional Control",
+            "Dual Control System: 2.4GHz Remote Control & Mobile App Control Support",
+            "Control Range: Approx. 20–30 meters",
+            "Battery: Rechargeable Battery Included (USB Charging Supported)",
+            "Remote Battery: AA Batteries (Not Included)",
+            "Material: High-quality Alloy + Plastic",
+            "Car Size: 13 × 5.2 × 3 cm",
+            "Design: Aerodynamic Formula Racing Style"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "Hstar 1:43 Roxy Porsche 911 4WD RC drift car",
+        "slug": "hstar-roxy-porsche-911-drift",
+        "price": 3999,
+        "originalPrice": 6999,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "hstar-roxy-porsche-911",
+        "description": "premium micro drift machine with realistic Porsche styling, gyro-equipped 4WD system for precise slides, and high-grip tires. Perfect for indoor tracks, it delivers pro-level drifting at pocket-sized scale with responsive 2.4GHz control and durable alloy chassis. Ideal for RC enthusiasts seeking authentic rally performance!",
+        "specs": [
+            "Scale: 1:43 scale micro drift machine",
+            "Drifting Performance: Gyro-equipped 4WD system for precise slides and controlled drift action",
+            "Tires: High-grip tires included for multiple track surfaces",
+            "Build Quality: Durable alloy chassis with premium scale Porsche detailing",
+            "Control System: Responsive 2.4GHz remote control system",
+            "Usage: Perfect for indoor tracks, desk drifting, and hobbyist rally racing"
+        ]
+    },
+    {
+        "id": 30,
+        "name": "Monster Truck MINI RC 2.4GHz App Control",
+        "slug": "monster-truck-mini-rc-app",
+        "price": 1475,
+        "originalPrice": 1975,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "monster-truck-mini-rc",
+        "description": "Monster Truck MINI RC with 2.4GHz remote control and mobile app operation. The Trasped HG4-477 Monster Truck MINI RC features LED lights, durable metal parts, and strong off-road performance in a compact size. Perfect for hobbyists, toy stores, and wholesale buyers looking for Trasped HG4-477 Monster Truck MINI RC in India",
+        "specs": [
+            "Model: Trasped HG4-477 Mini Monster Truck",
+            "Control System: Dual control support (2.4GHz Remote Control & Mobile App Control)",
+            "Build Features: Durable metal components and high-clearance frame",
+            "Lighting: Integrated LED lights for night driving",
+            "Usage: Compact off-road RC driving and desk crawling",
+            "Car Size: 13 × 7.8 × 8.4 cm"
+        ]
+    },
+    {
+        "id": 31,
+        "name": "1:64 Porsche Mini RC Drift Car",
+        "slug": "porsche-mini-rc-drift",
+        "price": 1450,
+        "originalPrice": 2550,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "porsche-mini-rc",
+        "description": "Desktop Mini RC Drift Car is a compact and stylish 1:64 scale electric RC car designed for indoor and outdoor fun. Built with a simple ready-to-go setup, this mini drift car is perfect for beginners and kids of all ages. Its small size, smooth controls, and drift capability make it ideal for desk play, gifting, and casual racing fun",
+        "specs": [
+            "Brand/Model: WGNRC Desktop Mini RC Drift Car HG4-429",
+            "Scale: 1:64 compact mini drift car design",
+            "Performance: Electric-powered smooth driving performance",
+            "Control System: 4-channel remote control system for better accuracy",
+            "Remote Control Distance: 30 to 50 meters",
+            "Build: Lightweight and durable plastic construction",
+            "Suitable For: Kids aged 3+, beginners, indoor desk/floor play, casual outdoor smooth surface racing, and collectors",
+            "Package Includes: 1 x HG4-429 Mini RC Drift Car, 1 x Remote Controller, 1 x Original Box Packaging, 1 x User Manual"
+        ]
+    },
+    {
+        "id": 32,
+        "name": "1:43 Toyota Trueno 4WD Drift Skill RC Car",
+        "slug": "toyota-trueno-4wd-drift",
+        "price": 4999,
+        "originalPrice": 7999,
+        "category": "Hobby Grade Off-Road & Drift Collection",
+        "image": "toyota-trueno-4wd",
+        "description": "Experience thrilling mini drifts with the 1:43 Toyota Trueno 4WD Drift Skill RC Car – for indoor/outdoor racing fun!",
+        "specs": [
+            "Scale: 1:43 Mini Drift RC Car",
+            "Drifting Performance: High-speed 4WD drifting, max speed 18 km/h",
+            "Motor: 615 hollow cup motor (51,000 rpm)",
+            "ESC: 2A ESC with brakes for precise control",
+            "Control System: Proportional 2.4GHz 4CH control (30-40m range)",
+            "Battery: 3.7V 180mAh Li-ion (provides 25-30 min playtime, ~25 min Type-C charge)",
+            "Build Quality: 11 × 4.5 × 9 cm PA+alloy chassis with full bearings",
+            "Package Includes: Car, 2.4G Remote (requires 3× AA batteries, not included), 4 × Tires, 4 × Traffic Cones, Screwdriver, Type-C Cable, Manual"
+        ]
+    }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "premium-rc-construction-models",
+    "name": "Premium RC Construction Models",
+    "description": "Heavy duty RC construction vehicles.",
+    "image": "cat-construction",
+    "featured": true
+  },
+  {
+    "id": "hobby-grade-off-road-collection",
+    "name": "Hobby Grade Off-Road & Drift Collection",
+    "description": "Navigate rocky terrain and steep climbs.",
+    "image": "cat-offroad",
+    "featured": true
+  },
+  {
+    "id": "collectors-diecast-gallery",
+    "name": "Collector’s Diecast Gallery",
+    "description": "Precision diecast models and accessories.",
+    "image": "cat-diecast",
+    "featured": true
+  },
+  {
+    "id": "toy-grade-drone-collection",
+    "name": "Toy Grade Drone Collection",
+    "description": "High-energy flying RC models.",
+    "image": "cat-drone",
+    "featured": true
+  },
+  {
+    "id": "trending-gadgets",
+    "name": "Trending Gadgets",
+    "description": "Exciting trendy RC-powered gadgets.",
+    "image": "cat-gadgets",
+    "featured": true
+  }
+]

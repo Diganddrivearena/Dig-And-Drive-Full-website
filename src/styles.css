@@ -1,0 +1,265 @@
+@import "tailwindcss";
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-black: var(--brand-black);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-gray: var(--brand-gray);
+  --color-brand-dark: var(--brand-dark);
+  --color-whatsapp: var(--whatsapp);
+  --font-display: "Anton", "Bebas Neue", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.5rem;
+
+  --brand-yellow: #F4B21A;
+  --brand-black: #171317;
+  --brand-orange: #D94F14;
+  --brand-gray: #F5F5F5;
+  --brand-dark: #444444;
+  --whatsapp: #128C7E;
+
+  --background: #FFFFFF;
+  --foreground: #171317;
+  --card: #FFFFFF;
+  --card-foreground: #171317;
+  --popover: #FFFFFF;
+  --popover-foreground: #171317;
+  --primary: #F4B21A;
+  --primary-foreground: #171317;
+  --secondary: #171317;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F5F5F5;
+  --muted-foreground: #444444;
+  --accent: #F26522;
+  --accent-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E5E5;
+  --input: #E5E5E5;
+  --ring: #F4B21A;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-brand-dark) var(--color-brand-black);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  /* Custom Webkit Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-brand-black);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-brand-dark);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-yellow);
+  }
+}
+
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 1280px;
+
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility btn-yellow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--brand-yellow);
+  color: var(--brand-black);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.875rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  box-shadow: 0 6px 20px -8px rgba(244, 178, 26, 0.6);
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #ffc233;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -10px rgba(244, 178, 26, 0.8);
+  }
+}
+
+@utility btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--whatsapp);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #1ebe5b;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -10px rgba(37, 211, 102, 0.7);
+  }
+}
+
+@utility btn-outline-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #fff;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #fff;
+    color: var(--brand-black);
+  }
+}
+
+@utility section-pad {
+  padding-block: 4rem;
+
+  @media (min-width: 768px) {
+    padding-block: 6rem;
+  }
+}
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--brand-yellow);
+  color: var(--brand-black);
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+
+  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-brand-yellow);
+  }
+}
+
+@utility range-square-knob {
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--brand-yellow);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: var(--brand-yellow);
+    border-radius: 2px;
+    cursor: pointer;
+    border: none;
+  }
+}
