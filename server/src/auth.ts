@@ -16,6 +16,38 @@ function adminEmails(): Set<string> {
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
+/** Allow apex + www (and optional BETTER_AUTH_TRUSTED_ORIGINS) for Better Auth CSRF checks. */
+function buildTrustedOrigins(): string[] {
+  const origins = new Set<string>([
+    "http://localhost:5173",
+    "http://localhost:8787",
+  ]);
+
+  const addOrigin = (raw: string) => {
+    const value = raw.trim().replace(/\/$/, "");
+    if (!value) return;
+    origins.add(value);
+    try {
+      const url = new URL(value.includes("://") ? value : `https://${value}`);
+      origins.add(url.origin);
+      const bareHost = url.hostname.replace(/^www\./, "");
+      if (bareHost !== "localhost" && !bareHost.startsWith("127.")) {
+        origins.add(`${url.protocol}//${bareHost}`);
+        origins.add(`${url.protocol}//www.${bareHost}`);
+      }
+    } catch {
+      // ignore malformed entries
+    }
+  };
+
+  addOrigin(process.env.BETTER_AUTH_URL ?? "http://localhost:5173");
+  for (const entry of (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "").split(",")) {
+    addOrigin(entry);
+  }
+
+  return [...origins];
+}
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -29,11 +61,7 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:5173",
   basePath: "/api/auth",
-  trustedOrigins: [
-    process.env.BETTER_AUTH_URL ?? "http://localhost:5173",
-    "http://localhost:5173",
-    "http://localhost:8787",
-  ],
+  trustedOrigins: buildTrustedOrigins(),
   socialProviders:
     googleClientId && googleClientSecret
       ? {
