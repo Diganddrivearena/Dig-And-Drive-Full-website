@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 import * as schema from "./db/schema";
+import { notifyNewAccount } from "./lib/fast2sms";
 
 function adminEmails(): Set<string> {
   return new Set(
@@ -108,6 +109,11 @@ export const auth = betterAuth({
         defaultValue: "customer",
         input: false,
       },
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+      },
     },
   },
   databaseHooks: {
@@ -117,6 +123,13 @@ export const auth = betterAuth({
           const email = (user.email ?? "").toLowerCase();
           const role = adminEmails().has(email) ? "admin" : "customer";
           return { data: { ...user, role } };
+        },
+        after: async (user) => {
+          void notifyNewAccount({
+            name: user.name,
+            email: user.email,
+            phone: (user as { phone?: string | null }).phone,
+          }).catch((err) => console.error("[fast2sms] welcome SMS failed", err));
         },
       },
     },

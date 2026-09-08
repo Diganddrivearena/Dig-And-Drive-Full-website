@@ -24,6 +24,7 @@ type AuthContextValue = {
     name: string,
     email: string,
     password: string,
+    phone: string,
   ) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -63,12 +64,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           throw new Error(authErrorMessage(error, "Invalid email or password"));
         }
       },
-      signUpWithEmail: async (name, email, password) => {
+      signUpWithEmail: async (name, email, password, phone) => {
         const { error } = await authClient.signUp.email({
           name: name.trim(),
           email: email.trim().toLowerCase(),
           password,
-        });
+          phone: phone.replace(/\D/g, ""),
+        } as { name: string; email: string; password: string; phone: string });
         if (error) {
           throw new Error(authErrorMessage(error, "Could not create account"));
         }

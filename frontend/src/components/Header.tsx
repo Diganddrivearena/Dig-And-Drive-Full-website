@@ -108,11 +108,11 @@ export function Header() {
 
             {!isPending &&
               (user ? (
-                <div className="hidden sm:flex items-center gap-1">
+                <div className="flex items-center gap-1">
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className="rounded-md border-2 border-brand-orange px-2 py-1.5 text-xs font-bold text-brand-orange hover:bg-brand-orange hover:text-white transition-colors"
+                      className="hidden sm:inline-flex rounded-md border-2 border-brand-orange px-2 py-1.5 text-xs font-bold text-brand-orange hover:bg-brand-orange hover:text-white transition-colors"
                     >
                       Admin
                     </Link>
@@ -131,16 +131,24 @@ export function Header() {
                   </button>
                 </div>
               ) : (
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <button
                     onClick={() => navigate("/login")}
-                    className="btn-dark text-xs py-1.5 px-3 normal-case tracking-wide"
+                    className="p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer sm:hidden"
+                    aria-label="Login"
+                    title="Login"
+                  >
+                    <UserRound className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="btn-dark hidden sm:inline-flex text-xs py-1.5 px-3 normal-case tracking-wide"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => navigate("/login?mode=register")}
-                    className="rounded-md bg-brand-orange px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-black transition-colors cursor-pointer"
+                    className="hidden sm:inline-flex rounded-md bg-brand-orange px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-black transition-colors cursor-pointer"
                   >
                     Register
                   </button>
@@ -187,7 +195,7 @@ export function Header() {
                   {n.label}
                 </Link>
               ))}
-              {!user && (
+              {!user ? (
                 <div className="flex gap-2 py-3">
                   <button
                     className="btn-dark flex-1 text-xs py-2 normal-case tracking-wide"
@@ -206,6 +214,21 @@ export function Header() {
                     }}
                   >
                     Register
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-2 py-3">
+                  <span className="text-sm font-semibold truncate">
+                    {user.name || user.email}
+                  </span>
+                  <button
+                    className="btn-dark text-xs py-2 px-3 normal-case tracking-wide"
+                    onClick={() => {
+                      setOpen(false);
+                      void signOut();
+                    }}
+                  >
+                    Logout
                   </button>
                 </div>
               )}

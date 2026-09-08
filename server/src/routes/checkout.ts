@@ -12,7 +12,7 @@ import {
 import type { AppVariables } from "../app";
 import { requireAuth } from "../middleware";
 import { computeDiscount } from "../lib/coupons";
-import { getRazorpay, verifyPaymentSignature } from "../lib/razorpay";
+import { getRazorpay, verifyPaymentSignature, fetchCapturedPayment } from "../lib/razorpay";
 import {
   normalizeIndianPhone,
   notifyOrderPaid,
@@ -209,6 +209,39 @@ checkoutRoutes.post("/verify", requireAuth, async (c) => {
     return c.json({ error: "Invalid payment signature" }, 400);
   }
 
+  let captured = false;
+  try {
+    const fetched = await fetchCapturedPayment(razorpayPaymentId);
+    captured = fetched.captured;
+    if (fetched.payment.order_id && fetched.payment.order_id !== razorpayOrderId) {
+      captured = false;
+    }
+  } catch (err) {
+    console.error("[checkout] Razorpay payment fetch failed", err);
+    return c.json({ error: "Could not confirm payment with Razorpay" }, 400);
+  }
+
+  if (!captured) {
+    await db
+      .update(orders)
+      .set({ status: "failed", updatedAt: new Date() })
+      .where(eq(orders.id, orderId));
+    return c.json({ error: "Payment is not completed" }, 400);
+  }
+
+  if (order.status === "paid") {
+    return c.json({
+      ok: true,
+      orderId,
+      status: "paid",
+      notifications: {
+        customerWhatsApp: false,
+        customerSms: false,
+        adminSms: false,
+      },
+    });
+  }
+
   await db
     .update(orders)
     .set({ status: "paid", updatedAt: new Date() })
@@ -239,8 +272,7 @@ checkoutRoutes.post("/verify", requireAuth, async (c) => {
     .from(orderItems)
     .where(eq(orderItems.orderId, orderId));
 
-  // Fire-and-forget — don't block payment success on SMS/WhatsApp
-  void notifyOrderPaid({
+  const notifications = await notifyOrderPaid({
     orderId,
     customerName: user.name || "Customer",
     phone: order.phone || "",
@@ -254,7 +286,14 @@ checkoutRoutes.post("/verify", requireAuth, async (c) => {
     discount: order.discount,
     total: order.total,
     couponCode: order.couponCode,
-  }).catch((err) => console.error("[fast2sms] notify failed", err));
+  }).catch((err) => {
+    console.error("[fast2sms] notify failed", err);
+    return {
+      customerWhatsApp: false,
+      customerSms: false,
+      adminSms: false,
+    };
+  });
 
-  return c.json({ ok: true, orderId, status: "paid" });
+  return c.json({ ok: true, orderId, status: "paid", notifications });
 });

@@ -19,6 +19,7 @@ export function LoginPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (isPending) {
@@ -42,8 +43,12 @@ export function LoginPage() {
         if (password.length < 8) {
           throw new Error("Password must be at least 8 characters");
         }
-        await signUpWithEmail(name, email, password);
-        toast.success("Account created");
+        const digits = phone.replace(/\D/g, "");
+        if (digits.length !== 10 || !/^[6-9]/.test(digits)) {
+          throw new Error("Enter a valid 10-digit mobile number for SMS");
+        }
+        await signUpWithEmail(name, email, password, digits);
+        toast.success("Account created. A welcome SMS will be sent to your mobile.");
       } else {
         await signInWithEmail(email, password);
         toast.success("Logged in");
@@ -89,6 +94,18 @@ export function LoginPage() {
             autoComplete="email"
             required
           />
+          {mode === "register" && (
+            <input
+              className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+              type="tel"
+              inputMode="numeric"
+              placeholder="10-digit mobile (for SMS)"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              autoComplete="tel"
+              required
+            />
+          )}
           <input
             className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
             type="password"

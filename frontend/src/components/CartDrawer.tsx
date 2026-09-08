@@ -125,7 +125,14 @@ export function CartDrawer() {
         },
         handler: async (response: RazorpaySuccessResponse) => {
           try {
-            await api("/checkout/verify", {
+            const result = await api<{
+              ok: boolean;
+              status: string;
+              notifications?: {
+                customerWhatsApp?: boolean;
+                customerSms?: boolean;
+              };
+            }>("/checkout/verify", {
               method: "POST",
               body: JSON.stringify({
                 orderId: order.orderId,
@@ -134,18 +141,39 @@ export function CartDrawer() {
                 razorpaySignature: response.razorpay_signature,
               }),
             });
+            if (!result.ok || result.status !== "paid") {
+              throw new Error("Payment is not confirmed yet");
+            }
             clearCart();
             setDiscount(0);
             setAppliedCoupon(null);
             setCouponCode("");
             setIsOpen(false);
+            const sent =
+              result.notifications?.customerWhatsApp ||
+              result.notifications?.customerSms;
             toast.success(
-              "Payment successful! Order confirmation sent on WhatsApp.",
+              sent
+                ? "Payment successful. Your order is confirmed and a message was sent."
+                : "Payment successful. Your order is confirmed.",
             );
           } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Verification failed");
+            toast.error(
+              err instanceof Error
+                ? err.message
+                : "Payment could not be verified. Order was not confirmed.",
+            );
           }
         },
+        modal: {
+          ondismiss: () => {
+            toast.message("Payment cancelled. No order was confirmed.");
+          },
+        },
+      });
+
+      rzp.on("payment.failed", () => {
+        toast.error("Payment failed. No order was confirmed.");
       });
 
       rzp.open();
@@ -328,7 +356,7 @@ export function CartDrawer() {
                   disabled={paying}
                   className="btn-yellow w-full py-3 text-base justify-center"
                 >
-                  {paying ? "Processing…" : user ? "Pay with Razorpay" : "Sign in & Pay"}
+                  {paying ? "Processing…" : user ? "Pay Now" : "Sign in & Pay"}
                 </button>
                 <button
                   onClick={handleWhatsAppCheckout}

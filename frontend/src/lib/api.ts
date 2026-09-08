@@ -26,10 +26,22 @@ export async function api<T>(
     ...options,
     credentials: "include",
     headers,
+    signal: options.signal ?? AbortSignal.timeout(20000),
   });
 
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new ApiError(
+        res.ok ? "Invalid server response" : "Request failed",
+        res.status,
+        text.slice(0, 200),
+      );
+    }
+  }
 
   if (!res.ok) {
     const message =

@@ -36,7 +36,13 @@ export function useProduct(slug: string | undefined) {
 export function useBanners() {
   return useQuery({
     queryKey: ["banners"],
-    queryFn: () => api<ApiBanner[]>("/banners"),
+    queryFn: async () => {
+      try {
+        return await api<ApiBanner[]>("/banners");
+      } catch {
+        return [] as ApiBanner[];
+      }
+    },
     staleTime: 60_000,
   });
 }

@@ -26,3 +26,15 @@ export function verifyPaymentSignature(params: {
   const expected = crypto.createHmac("sha256", secret).update(body).digest("hex");
   return expected === params.signature;
 }
+
+export function isLiveRazorpay() {
+  return (process.env.RAZORPAY_KEY_ID ?? "").startsWith("rzp_live_");
+}
+
+export async function fetchCapturedPayment(paymentId: string) {
+  const razorpay = getRazorpay();
+  const payment = await razorpay.payments.fetch(paymentId);
+  const status = String(payment.status ?? "");
+  const captured = status === "captured" || status === "authorized";
+  return { captured, status, payment };
+}

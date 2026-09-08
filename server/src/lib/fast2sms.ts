@@ -189,20 +189,34 @@ export function buildAdminSmsMessage(order: OrderNotifyPayload) {
     .join(" | ");
 }
 
+export type NotifyResult = {
+  customerWhatsApp: boolean;
+  customerSms: boolean;
+  adminSms: boolean;
+};
+
 /**
  * After payment succeeds: WhatsApp template to customer,
  * optional Quick SMS to customer, optional admin Quick SMS.
  */
-export async function notifyOrderPaid(order: OrderNotifyPayload) {
+export async function notifyOrderPaid(
+  order: OrderNotifyPayload,
+): Promise<NotifyResult> {
+  const result: NotifyResult = {
+    customerWhatsApp: false,
+    customerSms: false,
+    adminSms: false,
+  };
+
   if (!apiKey()) {
     console.warn("[fast2sms] notify skipped — no API key");
-    return;
+    return result;
   }
 
   const phone = normalizeIndianPhone(order.phone);
   if (!phone) {
     console.warn("[fast2sms] notify skipped — invalid customer phone");
-    return;
+    return result;
   }
 
   const variables = [
@@ -212,22 +226,68 @@ export async function notifyOrderPaid(order: OrderNotifyPayload) {
     formatInr(order.total),
   ];
 
-  await sendWhatsAppTemplate({ numbers: phone, variables });
+  const wa = await sendWhatsAppTemplate({ numbers: phone, variables });
+  result.customerWhatsApp = !wa.skipped && Boolean(wa.ok);
 
   if (process.env.FAST2SMS_SEND_SMS === "true") {
-    await sendQuickSms({
+    const sms = await sendQuickSms({
       numbers: phone,
       message: buildCustomerSmsMessage(order),
     });
+    result.customerSms = !sms.skipped && Boolean(sms.ok);
   }
 
   const admin = process.env.FAST2SMS_ADMIN_NUMBER?.trim();
   if (admin) {
-    await sendQuickSms({
+    const adminSms = await sendQuickSms({
       numbers: admin,
       message: buildAdminSmsMessage({ ...order, phone }),
     });
+    result.adminSms = !adminSms.skipped && Boolean(adminSms.ok);
   }
+
+  return result;
+}
+
+export async function notifyNewAccount(params: {
+  name: string;
+  email: string;
+  phone?: string | null;
+}): Promise<NotifyResult> {
+  const result: NotifyResult = {
+    customerWhatsApp: false,
+    customerSms: false,
+    adminSms: false,
+  };
+  if (!apiKey()) return result;
+
+  const phone = params.phone ? normalizeIndianPhone(params.phone) : null;
+  const name = sanitizeVar(params.name || "Customer", 60);
+
+  if (phone) {
+    const sms = await sendQuickSms({
+      numbers: phone,
+      message: `DIG & DRIVE: Hi ${name}, your account is ready. Shop at diganddrive.in`,
+    });
+    result.customerSms = !sms.skipped && Boolean(sms.ok);
+  }
+
+  const admin = process.env.FAST2SMS_ADMIN_NUMBER?.trim();
+  if (admin) {
+    const adminSms = await sendQuickSms({
+      numbers: admin,
+      message: [
+        `New account: ${name}`,
+        params.email,
+        phone ? `+91 ${phone}` : null,
+      ]
+        .filter(Boolean)
+        .join(" | "),
+    });
+    result.adminSms = !adminSms.skipped && Boolean(adminSms.ok);
+  }
+
+  return result;
 }
 
 export { normalizeIndianPhone };

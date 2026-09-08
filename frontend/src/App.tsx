@@ -14,6 +14,7 @@ import { AdminBannersPage } from "@/pages/admin/AdminBannersPage";
 import { AdminOrdersPage } from "@/pages/admin/AdminOrdersPage";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
 import { LoginPage } from "@/pages/LoginPage";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const ProductsPage = lazy(() =>
   import("@/pages/ProductsPage").then((m) => ({ default: m.ProductsPage })),
@@ -29,6 +30,7 @@ const ProductDetailsPage = lazy(() =>
 
 export function App() {
   return (
+    <ErrorBoundary>
     <AuthProvider>
       <CartProvider>
         <Toaster />
@@ -61,6 +63,7 @@ export function App() {
         </Suspense>
       </CartProvider>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
