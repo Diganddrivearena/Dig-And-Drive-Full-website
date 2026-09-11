@@ -1,14 +1,23 @@
 import { X, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { imageFor } from "@/lib/images";
 import { waLink } from "@/lib/site";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { AnimatePresence, motion } from "framer-motion";
-import { api } from "@/lib/api";
+import { api, type ApiProfile } from "@/lib/api";
 import { loadRazorpay, type RazorpaySuccessResponse } from "@/lib/razorpay";
 import { toast } from "sonner";
+
+function toCheckoutPhone(raw: string | null | undefined): string {
+  if (!raw) return "";
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
+  if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.length === 10 && /^[6-9]/.test(digits)) return digits;
+  return "";
+}
 
 export function CartDrawer() {
   const {
@@ -27,8 +36,43 @@ export function CartDrawer() {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
   const payable = Math.max(0, cartTotal - discount);
+
+  // Prefill WhatsApp mobile from registered profile when the user hasn't edited it.
+  useEffect(() => {
+    if (!user || phoneTouched) return;
+
+    const fromSession = toCheckoutPhone(user.phone);
+    if (fromSession) {
+      setPhone(fromSession);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const profile = await api<ApiProfile>("/me");
+        if (cancelled || phoneTouched) return;
+        const fromProfile = toCheckoutPhone(profile.phone);
+        if (fromProfile) setPhone(fromProfile);
+      } catch {
+        // Not signed in / profile unavailable — leave field empty.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, phoneTouched, user?.phone]);
+
+  useEffect(() => {
+    if (!user) {
+      setPhoneTouched(false);
+      setPhone("");
+    }
+  }, [user]);
 
   const normalizedPhone = (() => {
     const digits = phone.replace(/\D/g, "");
@@ -319,7 +363,10 @@ export function CartDrawer() {
                     className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     placeholder="10-digit mobile number"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      setPhoneTouched(true);
+                      setPhone(e.target.value);
+                    }}
                   />
                 </div>
 
