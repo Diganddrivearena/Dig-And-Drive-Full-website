@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DndContext,
@@ -17,9 +17,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Pencil, Trash2, ImageIcon } from "lucide-react";
+import { GripVertical, Pencil, Trash2, ImageIcon, Upload } from "lucide-react";
 import { AdminTableSkeleton } from "@/components/admin/AdminLoader";
-import { api, type ApiProduct } from "@/lib/api";
+import { api, uploadProductImage, type ApiCategory, type ApiProduct } from "@/lib/api";
 import { imageFor, productImageKeys } from "@/lib/images";
 import { toast } from "sonner";
 
@@ -173,9 +173,15 @@ function SortableRow({
 
 export function AdminProductsPage() {
   const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: () => api<AdminProduct[]>("/admin/products"),
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["admin", "categories"],
+    queryFn: () => api<ApiCategory[]>("/admin/categories"),
   });
   const [items, setItems] = useState<AdminProduct[]>([]);
   const [form, setForm] = useState<ProductForm>(emptyForm);
@@ -184,6 +190,21 @@ export function AdminProductsPage() {
   useEffect(() => {
     setItems(data);
   }, [data]);
+
+  const onUpload = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadProductImage(file);
+      setForm((f) => ({ ...f, imageKey: url }));
+      toast.success("Image uploaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -351,13 +372,23 @@ export function AdminProductsPage() {
             }))
           }
         />
-        <input
-          className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-          placeholder="Category"
+        <select
+          className="border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
           value={form.category}
           onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
           required
-        />
+        >
+          <option value="">Select category</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+          {form.category &&
+            !categories.some((c) => c.name === form.category) && (
+              <option value={form.category}>{form.category} (current)</option>
+            )}
+        </select>
 
         <div className="md:col-span-2 rounded-xl border border-border bg-brand-gray/30 p-3">
           <div className="flex items-center gap-2 text-sm font-semibold mb-3">
@@ -373,20 +404,53 @@ export function AdminProductsPage() {
               />
             </div>
             <div className="flex-1 w-full space-y-2">
-              <select
+              <input
                 className="w-full border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+                placeholder="Image key or /uploads/products/…"
                 value={form.imageKey}
-                onChange={(e) => setForm((f) => ({ ...f, imageKey: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, imageKey: e.target.value }))
+                }
                 required
-              >
-                {productImageKeys.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={(e) => onUpload(e.target.files?.[0])}
+                />
+                <button
+                  type="button"
+                  disabled={uploading}
+                  onClick={() => fileRef.current?.click()}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-semibold hover:border-brand-orange hover:bg-brand-orange/5 transition-colors disabled:opacity-60"
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploading ? "Uploading…" : "Upload image"}
+                </button>
+                <select
+                  className="border rounded-lg px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+                  value={
+                    productImageKeys.includes(form.imageKey) ? form.imageKey : ""
+                  }
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setForm((f) => ({ ...f, imageKey: e.target.value }));
+                    }
+                  }}
+                >
+                  <option value="">Or pick bundled asset…</option>
+                  {productImageKeys.map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
-                {productImageKeys.map((key) => (
+                {productImageKeys.slice(0, 24).map((key) => (
                   <button
                     key={key}
                     type="button"

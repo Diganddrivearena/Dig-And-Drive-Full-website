@@ -1,5 +1,16 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, Phone, MapPin, Truck, X, ShoppingBag, LogOut, UserRound } from "lucide-react";
+import {
+  Menu,
+  Phone,
+  MapPin,
+  Truck,
+  X,
+  ShoppingBag,
+  LogOut,
+  UserRound,
+  Heart,
+  Package,
+} from "lucide-react";
 import { useState } from "react";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import logo from "@/assets/logo.webp";
@@ -15,6 +26,9 @@ const NAV = [
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];
+
+const navBtn =
+  "inline-flex h-9 items-center justify-center gap-1.5 rounded-md px-3 text-xs font-bold tracking-wide transition-colors cursor-pointer";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -91,11 +105,11 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <HeaderSearch />
             <button
               onClick={() => setIsOpen(true)}
-              className="relative p-2 text-brand-black hover:text-brand-orange transition-colors mr-1 cursor-pointer"
+              className="relative p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer"
               aria-label="Open cart"
             >
               <ShoppingBag className="h-6 w-6" />
@@ -112,15 +126,33 @@ export function Header() {
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className="hidden sm:inline-flex rounded-md border-2 border-brand-orange px-2 py-1.5 text-xs font-bold text-brand-orange hover:bg-brand-orange hover:text-white transition-colors"
+                      className={`${navBtn} hidden sm:inline-flex border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white`}
                     >
                       Admin
                     </Link>
                   )}
-                  <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-brand-black max-w-[120px] truncate px-1">
+                  <Link
+                    to="/account"
+                    className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-brand-black max-w-[120px] truncate px-1 hover:text-brand-orange"
+                    title="My account"
+                  >
                     <UserRound className="h-3.5 w-3.5 shrink-0" />
                     {user.name?.split(" ")[0] || "Account"}
-                  </span>
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    className="p-2 text-brand-black hover:text-brand-orange"
+                    aria-label="Wishlist"
+                  >
+                    <Heart className="h-5 w-5" />
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="p-2 text-brand-black hover:text-brand-orange"
+                    aria-label="Orders"
+                  >
+                    <Package className="h-5 w-5" />
+                  </Link>
                   <button
                     onClick={() => signOut()}
                     className="p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer"
@@ -131,24 +163,16 @@ export function Header() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 sm:gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => navigate("/login")}
-                    className="p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer sm:hidden"
-                    aria-label="Login"
-                    title="Login"
-                  >
-                    <UserRound className="h-6 w-6" />
-                  </button>
-                  <button
-                    onClick={() => navigate("/login")}
-                    className="btn-dark hidden sm:inline-flex text-xs py-1.5 px-3 normal-case tracking-wide"
+                    className={`${navBtn} border-2 border-brand-black text-brand-black hover:bg-brand-black hover:text-white`}
                   >
                     Login
                   </button>
                   <button
                     onClick={() => navigate("/login?mode=register")}
-                    className="hidden sm:inline-flex rounded-md bg-brand-orange px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-black transition-colors cursor-pointer"
+                    className={`${navBtn} bg-brand-orange text-white hover:bg-brand-black`}
                   >
                     Register
                   </button>
@@ -156,18 +180,12 @@ export function Header() {
               ))}
 
             <a
-              href={`tel:${SITE.phoneRaw}`}
-              className="btn-dark hidden xl:inline-flex text-sm normal-case tracking-normal py-2 px-3"
-            >
-              <Phone className="h-4 w-4" /> Call
-            </a>
-            <a
               href={waLink("Hello DIG & DRIVE ARENA, I have a query.")}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-whatsapp text-sm !px-3 sm:!px-5"
+              className={`${navBtn} bg-[#25D366] text-white hover:bg-[#1ebe5b]`}
             >
-              <WhatsAppIcon className="h-5 w-5" />{" "}
+              <WhatsAppIcon className="h-4 w-4" />
               <span className="hidden sm:inline">WhatsApp</span>
             </a>
             <button
@@ -195,10 +213,35 @@ export function Header() {
                   {n.label}
                 </Link>
               ))}
+              {user && (
+                <>
+                  <Link
+                    to="/account"
+                    onClick={() => setOpen(false)}
+                    className="py-3 text-sm font-semibold border-b border-border"
+                  >
+                    My Account
+                  </Link>
+                  <Link
+                    to="/orders"
+                    onClick={() => setOpen(false)}
+                    className="py-3 text-sm font-semibold border-b border-border"
+                  >
+                    My Orders
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setOpen(false)}
+                    className="py-3 text-sm font-semibold border-b border-border"
+                  >
+                    Wishlist
+                  </Link>
+                </>
+              )}
               {!user ? (
                 <div className="flex gap-2 py-3">
                   <button
-                    className="btn-dark flex-1 text-xs py-2 normal-case tracking-wide"
+                    className={`${navBtn} flex-1 border-2 border-brand-black`}
                     onClick={() => {
                       setOpen(false);
                       navigate("/login");
@@ -207,7 +250,7 @@ export function Header() {
                     Login
                   </button>
                   <button
-                    className="flex-1 rounded-md bg-brand-orange py-2 text-xs font-bold uppercase text-white hover:bg-brand-black transition-colors cursor-pointer"
+                    className={`${navBtn} flex-1 bg-brand-orange text-white`}
                     onClick={() => {
                       setOpen(false);
                       navigate("/login?mode=register");
@@ -222,7 +265,7 @@ export function Header() {
                     {user.name || user.email}
                   </span>
                   <button
-                    className="btn-dark text-xs py-2 px-3 normal-case tracking-wide"
+                    className={`${navBtn} border-2 border-brand-black`}
                     onClick={() => {
                       setOpen(false);
                       void signOut();

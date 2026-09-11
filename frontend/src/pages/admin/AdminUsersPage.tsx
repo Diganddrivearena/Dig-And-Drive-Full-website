@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users } from "lucide-react";
+import { Trash2, Users } from "lucide-react";
 import { AdminTableSkeleton } from "@/components/admin/AdminLoader";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 type AdminUser = {
   id: string;
@@ -17,6 +18,7 @@ type AdminUser = {
 };
 
 export function AdminUsersPage() {
+  const { user: self } = useAuth();
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "users"],
@@ -31,6 +33,16 @@ export function AdminUsersPage() {
       }),
     onSuccess: () => {
       toast.success("Role updated");
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) =>
+      api(`/admin/users/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      toast.success("User deleted");
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -114,25 +126,47 @@ export function AdminUsersPage() {
                       : "—"}
                   </td>
                   <td className="p-3">
-                    {u.role === "admin" ? (
-                      <button
-                        type="button"
-                        className="text-xs font-semibold text-muted-foreground hover:text-brand-black"
-                        onClick={() =>
-                          setRole.mutate({ id: u.id, role: "customer" })
-                        }
-                      >
-                        Make customer
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="text-xs font-semibold text-brand-orange hover:underline"
-                        onClick={() => setRole.mutate({ id: u.id, role: "admin" })}
-                      >
-                        Make admin
-                      </button>
-                    )}
+                    <div className="flex flex-wrap items-center gap-3">
+                      {u.role === "admin" ? (
+                        <button
+                          type="button"
+                          className="text-xs font-semibold text-muted-foreground hover:text-brand-black"
+                          onClick={() =>
+                            setRole.mutate({ id: u.id, role: "customer" })
+                          }
+                        >
+                          Make customer
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-xs font-semibold text-brand-orange hover:underline"
+                          onClick={() =>
+                            setRole.mutate({ id: u.id, role: "admin" })
+                          }
+                        >
+                          Make admin
+                        </button>
+                      )}
+                      {self?.id !== u.id && (
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 hover:underline"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                `Delete user ${u.email}? This cannot be undone.`,
+                              )
+                            ) {
+                              remove.mutate(u.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Delete
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -12,6 +12,7 @@ import {
   orderItems,
   payments,
   user,
+  categories,
 } from "../db/schema";
 import type { AppVariables } from "../app";
 import { requireAdmin } from "../middleware";
@@ -323,15 +324,35 @@ adminRoutes.post("/banners/reorder", async (c) => {
 
 adminRoutes.post("/banners/upload", async (c) => {
   const body = await c.req.parseBody();
-  const file = body["file"];
+  return saveUploadedImage(body["file"], "banners", "banner");
+});
+
+adminRoutes.post("/products/upload", async (c) => {
+  const body = await c.req.parseBody();
+  return saveUploadedImage(body["file"], "products", "product");
+});
+
+adminRoutes.post("/categories/upload", async (c) => {
+  const body = await c.req.parseBody();
+  return saveUploadedImage(body["file"], "categories", "category");
+});
+
+async function saveUploadedImage(
+  file: unknown,
+  folder: string,
+  prefix: string,
+) {
   if (!file || !(file instanceof File)) {
-    return c.json({ error: "file is required" }, 400);
+    return Response.json({ error: "file is required" }, { status: 400 });
   }
   if (!file.type.startsWith("image/")) {
-    return c.json({ error: "Only image uploads are allowed" }, 400);
+    return Response.json(
+      { error: "Only image uploads are allowed" },
+      { status: 400 },
+    );
   }
   if (file.size > 5 * 1024 * 1024) {
-    return c.json({ error: "Image must be under 5MB" }, 400);
+    return Response.json({ error: "Image must be under 5MB" }, { status: 400 });
   }
 
   const ext =
@@ -342,13 +363,96 @@ adminRoutes.post("/banners/upload", async (c) => {
         : file.type === "image/gif"
           ? "gif"
           : "jpg";
-  const name = `banner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = resolve(process.cwd(), "../frontend/public/uploads/banners");
+  const name = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const dir = resolve(process.cwd(), `../frontend/public/uploads/${folder}`);
   await mkdir(dir, { recursive: true });
   const bytes = Buffer.from(await file.arrayBuffer());
   await writeFile(join(dir, name), bytes);
 
-  return c.json({ url: `/uploads/banners/${name}` });
+  return Response.json({ url: `/uploads/${folder}/${name}` });
+}
+
+const categorySchema = z.object({
+  id: z.string().min(1).max(80).optional(),
+  name: z.string().min(1),
+  description: z.string().optional().default(""),
+  imageKey: z.string().min(1),
+  featured: z.boolean().optional().default(true),
+});
+
+adminRoutes.get("/categories", async (c) => {
+  const rows = await db.select().from(categories).orderBy(asc(categories.name));
+  return c.json(rows);
+});
+
+adminRoutes.post("/categories", async (c) => {
+  const parsed = categorySchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json({ error: parsed.error.flatten() }, 400);
+  }
+  const data = parsed.data;
+  const id =
+    data.id?.trim() ||
+    data.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 60) ||
+    `cat-${Date.now()}`;
+
+  const [existing] = await db
+    .select()
+    .from(categories)
+    .where(eq(categories.id, id))
+    .limit(1);
+  if (existing) {
+    return c.json({ error: "Category id already exists" }, 400);
+  }
+
+  const [row] = await db
+    .insert(categories)
+    .values({
+      id,
+      name: data.name,
+      description: data.description,
+      imageKey: data.imageKey,
+      featured: data.featured ?? true,
+    })
+    .returning();
+  return c.json(row, 201);
+});
+
+adminRoutes.patch("/categories/:id", async (c) => {
+  const id = c.req.param("id");
+  const parsed = categorySchema.partial().safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json({ error: parsed.error.flatten() }, 400);
+  }
+  const data = parsed.data;
+  const [row] = await db
+    .update(categories)
+    .set({
+      ...(data.name !== undefined ? { name: data.name } : {}),
+      ...(data.description !== undefined
+        ? { description: data.description }
+        : {}),
+      ...(data.imageKey !== undefined ? { imageKey: data.imageKey } : {}),
+      ...(data.featured !== undefined ? { featured: data.featured } : {}),
+    })
+    .where(eq(categories.id, id))
+    .returning();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json(row);
+});
+
+adminRoutes.delete("/categories/:id", async (c) => {
+  const id = c.req.param("id");
+  const [row] = await db
+    .delete(categories)
+    .where(eq(categories.id, id))
+    .returning();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json({ ok: true });
 });
 
 adminRoutes.get("/orders", async (c) => {
@@ -424,12 +528,15 @@ adminRoutes.get("/users", async (c) => {
       .where(eq(orders.userId, u.id));
     const orderCount = userOrders.length;
     const totalSpent = userOrders
-      .filter((o) => o.status === "paid")
+      .filter((o) =>
+        ["paid", "processing", "shipped", "delivered"].includes(o.status),
+      )
       .reduce((sum, o) => sum + o.total, 0);
     result.push({
       id: u.id,
       name: u.name,
       email: u.email,
+      phone: u.phone,
       image: u.image,
       role: u.role,
       emailVerified: u.emailVerified,
@@ -461,4 +568,51 @@ adminRoutes.patch("/users/:id/role", async (c) => {
     email: row.email,
     role: row.role,
   });
+});
+
+adminRoutes.delete("/users/:id", async (c) => {
+  const id = c.req.param("id");
+  const self = c.get("user");
+  if (self?.id === id) {
+    return c.json({ error: "You cannot delete your own account" }, 400);
+  }
+  const [row] = await db.delete(user).where(eq(user.id, id)).returning();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json({ ok: true });
+});
+
+const orderStatusSchema = z.object({
+  status: z.enum([
+    "pending",
+    "paid",
+    "processing",
+    "shipped",
+    "delivered",
+    "cancelled",
+    "failed",
+  ]),
+});
+
+adminRoutes.patch("/orders/:id", async (c) => {
+  const id = Number(c.req.param("id"));
+  if (!Number.isFinite(id)) return c.json({ error: "Invalid id" }, 400);
+  const parsed = orderStatusSchema.safeParse(await c.req.json());
+  if (!parsed.success) {
+    return c.json({ error: parsed.error.flatten() }, 400);
+  }
+  const [row] = await db
+    .update(orders)
+    .set({ status: parsed.data.status, updatedAt: new Date() })
+    .where(eq(orders.id, id))
+    .returning();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json(row);
+});
+
+adminRoutes.delete("/orders/:id", async (c) => {
+  const id = Number(c.req.param("id"));
+  if (!Number.isFinite(id)) return c.json({ error: "Invalid id" }, 400);
+  const [row] = await db.delete(orders).where(eq(orders.id, id)).returning();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  return c.json({ ok: true });
 });

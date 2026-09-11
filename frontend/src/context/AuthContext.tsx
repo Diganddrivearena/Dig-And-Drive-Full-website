@@ -5,6 +5,7 @@ import {
   type ReactNode,
 } from "react";
 import { authClient } from "@/lib/auth-client";
+import { api } from "@/lib/api";
 
 type AuthUser = {
   id: string;
@@ -12,6 +13,7 @@ type AuthUser = {
   email: string;
   image?: string | null;
   role?: string | null;
+  phone?: string | null;
 };
 
 type AuthContextValue = {
@@ -20,6 +22,7 @@ type AuthContextValue = {
   isAdmin: boolean;
   signInWithGoogle: (callbackURL?: string) => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
+  signInWithIdentifier: (identifier: string, password: string) => Promise<void>;
   signUpWithEmail: (
     name: string,
     email: string,
@@ -27,6 +30,7 @@ type AuthContextValue = {
     phone: string,
   ) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -40,7 +44,8 @@ function authErrorMessage(err: unknown, fallback: string) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const { data: session, isPending: sessionPending, refetch } =
+    authClient.useSession();
 
   const value = useMemo<AuthContextValue>(() => {
     const user = (session?.user as AuthUser | undefined) ?? null;
@@ -61,7 +66,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password,
         });
         if (error) {
-          throw new Error(authErrorMessage(error, "Invalid email or password"));
+          throw new Error(
+            authErrorMessage(error, "Invalid email or password"),
+          );
+        }
+      },
+      signInWithIdentifier: async (identifier, password) => {
+        const raw = identifier.trim();
+        if (raw.includes("@")) {
+          const { error } = await authClient.signIn.email({
+            email: raw.toLowerCase(),
+            password,
+          });
+          if (error) {
+            throw new Error(
+              authErrorMessage(error, "Invalid email or password"),
+            );
+          }
+          return;
+        }
+
+        try {
+          await api("/me/sign-in-identifier", {
+            method: "POST",
+            body: JSON.stringify({ identifier: raw, password }),
+          });
+          await refetch();
+        } catch (err) {
+          throw new Error(
+            err instanceof Error ? err.message : "Invalid phone or password",
+          );
         }
       },
       signUpWithEmail: async (name, email, password, phone) => {
@@ -78,8 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut: async () => {
         await authClient.signOut();
       },
+      refreshSession: async () => {
+        await refetch();
+      },
     };
-  }, [session, sessionPending]);
+  }, [session, sessionPending, refetch]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

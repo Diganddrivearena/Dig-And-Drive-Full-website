@@ -1,4 +1,3 @@
-import { Hero } from "@/sections/Hero";
 import { Features } from "@/sections/Features";
 import { Categories } from "@/sections/Categories";
 import { RotatingPromoBanner } from "@/sections/RotatingPromoBanner";
@@ -12,7 +11,6 @@ import { Contact } from "@/sections/Contact";
 export function Home() {
   return (
     <div className="flex flex-col">
-      <Hero />
       <RotatingPromoBanner />
       <Features />
       <Categories />

@@ -1,11 +1,12 @@
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { AdminLoader } from "@/components/admin/AdminLoader";
-import { LayoutDashboard, Package, Ticket, Image, LogOut, ShoppingBag, Users } from "lucide-react";
+import { LayoutDashboard, Package, Ticket, Image, LogOut, ShoppingBag, Users, Tags } from "lucide-react";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/admin/products", label: "Products", icon: Package },
+  { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/coupons", label: "Coupons", icon: Ticket },

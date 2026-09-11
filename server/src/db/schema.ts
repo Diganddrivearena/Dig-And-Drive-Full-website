@@ -10,17 +10,26 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").notNull().default(false),
-  image: text("image"),
-  role: text("role").notNull().default("customer"),
-  phone: text("phone"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").notNull().default(false),
+    image: text("image"),
+    role: text("role").notNull().default("customer"),
+    phone: text("phone"),
+    addressLine1: text("address_line1"),
+    addressLine2: text("address_line2"),
+    city: text("city"),
+    state: text("state"),
+    pincode: text("pincode"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("user_phone_idx").on(t.phone)],
+);
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
@@ -126,12 +135,13 @@ export const banners = pgTable("banners", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+/** pending | paid | processing | shipped | delivered | cancelled | failed */
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
   email: text("email"),
   phone: text("phone"),
-  status: text("status").notNull().default("pending"), // pending | paid | failed | cancelled
+  status: text("status").notNull().default("pending"),
   subtotal: integer("subtotal").notNull(),
   discount: integer("discount").notNull().default(0),
   total: integer("total").notNull(),
@@ -167,7 +177,43 @@ export const payments = pgTable("payments", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: serial("id").primaryKey(),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(),
+    comment: text("comment").notNull().default(""),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("reviews_product_user_idx").on(t.productId, t.userId)],
+);
+
+export const wishlist = pgTable(
+  "wishlist",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("wishlist_user_product_idx").on(t.userId, t.productId)],
+);
+
 export type Product = typeof products.$inferSelect;
 export type Coupon = typeof coupons.$inferSelect;
 export type Banner = typeof banners.$inferSelect;
 export type Order = typeof orders.$inferSelect;
+export type Review = typeof reviews.$inferSelect;
+export type WishlistItem = typeof wishlist.$inferSelect;
+export type Category = typeof categories.$inferSelect;

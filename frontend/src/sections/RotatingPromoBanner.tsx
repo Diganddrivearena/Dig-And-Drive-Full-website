@@ -2,13 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { useBanners, useProducts } from "@/hooks/useCatalog";
+import { useBanners } from "@/hooks/useCatalog";
 import { imageFor, placeholderImg } from "@/lib/images";
-import type { ApiBanner, ApiProduct } from "@/lib/api";
+import type { ApiBanner } from "@/lib/api";
+import { SITE } from "@/lib/site";
 
-type Slide =
-  | { kind: "banner"; id: string; title: string; subtitle: string; href: string; image: string }
-  | { kind: "product"; id: string; title: string; subtitle: string; href: string; image: string; price: number };
+type Slide = {
+  id: string;
+  title: string;
+  subtitle: string;
+  href: string;
+  image: string;
+};
 
 function bannerSrc(value: string) {
   if (!value) return placeholderImg;
@@ -18,51 +23,31 @@ function bannerSrc(value: string) {
   return imageFor(value);
 }
 
-function buildSlides(banners: ApiBanner[], products: ApiProduct[]): Slide[] {
-  const bannerSlides: Slide[] = banners.map((b) => ({
-    kind: "banner",
-    id: `banner-${b.id}`,
-    title: b.title,
-    subtitle: b.subtitle || "Shop Dig & Drive",
-    href: b.linkUrl || "/products",
-    image: bannerSrc(b.imageUrl),
-  }));
-
-  const latest = [...products]
-    .sort((a, b) => {
-      const ta = a.createdAt ? new Date(a.createdAt).getTime() : a.id;
-      const tb = b.createdAt ? new Date(b.createdAt).getTime() : b.id;
-      return tb - ta;
-    })
-    .slice(0, 6);
-
-  const productSlides: Slide[] = latest.map((p) => ({
-    kind: "product",
-    id: `product-${p.id}`,
-    title: p.name,
-    subtitle: "New arrival",
-    href: `/products/${p.slug}`,
-    image: imageFor(p.image),
-    price: p.price,
-  }));
-
-  // Interleave product highlights with CMS banners when both exist
-  if (!bannerSlides.length) return productSlides;
-  if (!productSlides.length) return bannerSlides;
-
-  const merged: Slide[] = [];
-  const max = Math.max(bannerSlides.length, productSlides.length);
-  for (let i = 0; i < max; i++) {
-    if (bannerSlides[i]) merged.push(bannerSlides[i]);
-    if (productSlides[i]) merged.push(productSlides[i]);
+function buildSlides(banners: ApiBanner[]): Slide[] {
+  if (banners.length) {
+    return banners.map((b) => ({
+      id: `banner-${b.id}`,
+      title: b.title,
+      subtitle: b.subtitle || SITE.tagline,
+      href: b.linkUrl || "/products",
+      image: bannerSrc(b.imageUrl),
+    }));
   }
-  return merged;
+  return [
+    {
+      id: "fallback",
+      title: SITE.name,
+      subtitle: SITE.tagline,
+      href: "/products",
+      image: "/firstsection.webp",
+    },
+  ];
 }
 
+/** Full-bleed hero carousel driven by admin banners. */
 export function RotatingPromoBanner() {
-  const { data: banners = [] } = useBanners();
-  const { data: products = [], isLoading } = useProducts();
-  const slides = useMemo(() => buildSlides(banners, products), [banners, products]);
+  const { data: banners = [], isLoading } = useBanners();
+  const slides = useMemo(() => buildSlides(banners), [banners]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -73,11 +58,17 @@ export function RotatingPromoBanner() {
     if (slides.length < 2) return;
     const timer = window.setInterval(() => {
       setIndex((i) => (i + 1) % slides.length);
-    }, 5000);
+    }, 5500);
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  if (isLoading || slides.length === 0) return null;
+  if (isLoading) {
+    return (
+      <section className="relative bg-brand-black text-white min-h-[70vh] md:min-h-[85vh] grid place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-yellow border-t-transparent" />
+      </section>
+    );
+  }
 
   const slide = slides[index] ?? slides[0];
   const go = (dir: -1 | 1) => {
@@ -86,7 +77,7 @@ export function RotatingPromoBanner() {
 
   return (
     <section className="relative bg-brand-black text-white overflow-hidden">
-      <div className="relative min-h-[420px] md:min-h-[520px]">
+      <div className="relative min-h-[70vh] md:min-h-[85vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.id}
@@ -99,17 +90,15 @@ export function RotatingPromoBanner() {
             <img
               src={slide.image}
               alt=""
-              className="h-full w-full object-cover opacity-55"
+              className="h-full w-full object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/75 to-brand-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/70 to-brand-black/25" />
           </motion.div>
         </AnimatePresence>
 
-        <div className="container-x relative z-10 flex min-h-[420px] md:min-h-[520px] items-center py-16">
-          <div className="max-w-xl">
-            <span className="chip bg-brand-orange text-white">
-              {slide.kind === "product" ? "New product" : "Featured"}
-            </span>
+        <div className="container-x relative z-10 flex min-h-[70vh] md:min-h-[85vh] items-center py-16">
+          <div className="max-w-2xl">
+            <span className="chip bg-brand-orange text-white">DIG &amp; DRIVE ARENA</span>
             <AnimatePresence mode="wait">
               <motion.div
                 key={slide.id + "-copy"}
@@ -118,18 +107,14 @@ export function RotatingPromoBanner() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.4 }}
               >
-                <h2 className="mt-4 font-display text-4xl md:text-6xl leading-tight">
+                <h1 className="mt-4 font-display text-4xl md:text-7xl leading-tight">
                   {slide.title}
-                </h2>
-                <p className="mt-3 text-white/75 text-lg">{slide.subtitle}</p>
-                {slide.kind === "product" && (
-                  <p className="mt-2 font-display text-2xl text-brand-yellow">
-                    ₹{slide.price.toLocaleString("en-IN")}
-                  </p>
-                )}
-                <Link to={slide.href} className="btn-yellow mt-6 inline-flex">
-                  {slide.kind === "product" ? "View product" : "Shop now"}{" "}
-                  <ArrowRight className="h-4 w-4" />
+                </h1>
+                <p className="mt-4 text-white/80 text-lg md:text-xl max-w-xl">
+                  {slide.subtitle}
+                </p>
+                <Link to={slide.href} className="btn-yellow mt-8 inline-flex text-base px-8 py-3.5">
+                  Shop now <ArrowRight className="h-5 w-5" />
                 </Link>
               </motion.div>
             </AnimatePresence>
@@ -141,7 +126,7 @@ export function RotatingPromoBanner() {
             <button
               type="button"
               onClick={() => go(-1)}
-              className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
+              className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2.5 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -149,12 +134,12 @@ export function RotatingPromoBanner() {
             <button
               type="button"
               onClick={() => go(1)}
-              className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
+              className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 rounded-full border border-white/25 bg-black/40 p-2.5 text-white hover:bg-brand-yellow hover:text-brand-black transition-colors cursor-pointer"
               aria-label="Next slide"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
+            <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
               {slides.map((s, i) => (
                 <button
                   key={s.id}

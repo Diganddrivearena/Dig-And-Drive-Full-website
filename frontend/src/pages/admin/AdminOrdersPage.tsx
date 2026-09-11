@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import { AdminLoader } from "@/components/admin/AdminLoader";
 import { api } from "@/lib/api";
 import { imageFor, placeholderImg } from "@/lib/images";
+import { toast } from "sonner";
 
 type OrderRow = {
   id: number;
@@ -29,15 +31,49 @@ type OrderRow = {
   } | null;
 };
 
+const STATUSES = [
+  "pending",
+  "paid",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "failed",
+] as const;
+
 function itemImage(item: OrderRow["items"][number]) {
   const key = item.imageKey || item.image || "";
   return key ? imageFor(key) : placeholderImg;
 }
 
 export function AdminOrdersPage() {
+  const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "orders"],
     queryFn: () => api<OrderRow[]>("/admin/orders"),
+  });
+
+  const setStatus = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      api(`/admin/orders/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      }),
+    onSuccess: () => {
+      toast.success("Order status updated");
+      qc.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: number) =>
+      api(`/admin/orders/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      toast.success("Order deleted");
+      qc.invalidateQueries({ queryKey: ["admin", "orders"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   return (
@@ -54,13 +90,41 @@ export function AdminOrdersPage() {
               key={o.id}
               className="rounded-xl border border-border bg-white p-4 hover:border-brand-orange/40 transition-colors"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-semibold">
-                  Order #{o.id} ·{" "}
-                  <span className="uppercase text-brand-orange">{o.status}</span>
-                </div>
-                <div className="font-display text-xl">
-                  ₹{o.total.toLocaleString("en-IN")}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="font-semibold">Order #{o.id}</div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    className="border rounded-lg px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+                    value={o.status}
+                    disabled={setStatus.isPending}
+                    onChange={(e) =>
+                      setStatus.mutate({ id: o.id, status: e.target.value })
+                    }
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                    {!STATUSES.includes(o.status as (typeof STATUSES)[number]) && (
+                      <option value={o.status}>{o.status}</option>
+                    )}
+                  </select>
+                  <div className="font-display text-xl">
+                    ₹{o.total.toLocaleString("en-IN")}
+                  </div>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                    onClick={() => {
+                      if (confirm(`Delete order #${o.id}?`)) {
+                        remove.mutate(o.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </button>
                 </div>
               </div>
               <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -73,7 +137,11 @@ export function AdminOrdersPage() {
                 )}
                 <span>
                   {o.customer?.name || o.email || "Guest"}
-                  {o.customer?.email ? ` · ${o.customer.email}` : o.email && !o.customer ? ` · ${o.email}` : ""}
+                  {o.customer?.email
+                    ? ` · ${o.customer.email}`
+                    : o.email && !o.customer
+                      ? ` · ${o.email}`
+                      : ""}
                   {o.phone ? ` · +91 ${o.phone}` : ""}
                   {" · "}
                   {new Date(o.createdAt).toLocaleString("en-IN")}

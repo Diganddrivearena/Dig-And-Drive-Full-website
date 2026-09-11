@@ -196,8 +196,7 @@ export type NotifyResult = {
 };
 
 /**
- * After payment succeeds: WhatsApp template to customer,
- * optional Quick SMS to customer, optional admin Quick SMS.
+ * After payment succeeds: WhatsApp/SMS to customer and admin SMS in parallel.
  */
 export async function notifyOrderPaid(
   order: OrderNotifyPayload,
@@ -226,25 +225,29 @@ export async function notifyOrderPaid(
     formatInr(order.total),
   ];
 
-  const wa = await sendWhatsAppTemplate({ numbers: phone, variables });
-  result.customerWhatsApp = !wa.skipped && Boolean(wa.ok);
-
-  if (process.env.FAST2SMS_SEND_SMS === "true") {
-    const sms = await sendQuickSms({
-      numbers: phone,
-      message: buildCustomerSmsMessage(order),
-    });
-    result.customerSms = !sms.skipped && Boolean(sms.ok);
-  }
-
   const admin = process.env.FAST2SMS_ADMIN_NUMBER?.trim();
-  if (admin) {
-    const adminSms = await sendQuickSms({
-      numbers: admin,
-      message: buildAdminSmsMessage({ ...order, phone }),
-    });
-    result.adminSms = !adminSms.skipped && Boolean(adminSms.ok);
-  }
+  const sendCustomerSms = process.env.FAST2SMS_SEND_SMS === "true";
+
+  const [wa, sms, adminSms] = await Promise.all([
+    sendWhatsAppTemplate({ numbers: phone, variables }),
+    sendCustomerSms
+      ? sendQuickSms({
+          numbers: phone,
+          message: buildCustomerSmsMessage(order),
+        })
+      : Promise.resolve({ skipped: true as const, ok: false }),
+    admin
+      ? sendQuickSms({
+          numbers: admin,
+          message: buildAdminSmsMessage({ ...order, phone }),
+        })
+      : Promise.resolve({ skipped: true as const, ok: false }),
+  ]);
+
+  result.customerWhatsApp = !wa.skipped && Boolean(wa.ok);
+  result.customerSms = !("skipped" in sms && sms.skipped) && Boolean(sms.ok);
+  result.adminSms =
+    !("skipped" in adminSms && adminSms.skipped) && Boolean(adminSms.ok);
 
   return result;
 }
@@ -263,29 +266,32 @@ export async function notifyNewAccount(params: {
 
   const phone = params.phone ? normalizeIndianPhone(params.phone) : null;
   const name = sanitizeVar(params.name || "Customer", 60);
-
-  if (phone) {
-    const sms = await sendQuickSms({
-      numbers: phone,
-      message: `DIG & DRIVE: Hi ${name}, your account is ready. Shop at diganddrive.in`,
-    });
-    result.customerSms = !sms.skipped && Boolean(sms.ok);
-  }
-
   const admin = process.env.FAST2SMS_ADMIN_NUMBER?.trim();
-  if (admin) {
-    const adminSms = await sendQuickSms({
-      numbers: admin,
-      message: [
-        `New account: ${name}`,
-        params.email,
-        phone ? `+91 ${phone}` : null,
-      ]
-        .filter(Boolean)
-        .join(" | "),
-    });
-    result.adminSms = !adminSms.skipped && Boolean(adminSms.ok);
-  }
+
+  const [sms, adminSms] = await Promise.all([
+    phone
+      ? sendQuickSms({
+          numbers: phone,
+          message: `DIG & DRIVE: Hi ${name}, your account is ready. Shop at diganddrive.in`,
+        })
+      : Promise.resolve({ skipped: true as const, ok: false }),
+    admin
+      ? sendQuickSms({
+          numbers: admin,
+          message: [
+            `New account: ${name}`,
+            params.email,
+            phone ? `+91 ${phone}` : null,
+          ]
+            .filter(Boolean)
+            .join(" | "),
+        })
+      : Promise.resolve({ skipped: true as const, ok: false }),
+  ]);
+
+  result.customerSms = !("skipped" in sms && sms.skipped) && Boolean(sms.ok);
+  result.adminSms =
+    !("skipped" in adminSms && adminSms.skipped) && Boolean(adminSms.ok);
 
   return result;
 }

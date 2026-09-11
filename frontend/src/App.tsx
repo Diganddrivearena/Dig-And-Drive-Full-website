@@ -13,6 +13,7 @@ import { AdminCouponsPage } from "@/pages/admin/AdminCouponsPage";
 import { AdminBannersPage } from "@/pages/admin/AdminBannersPage";
 import { AdminOrdersPage } from "@/pages/admin/AdminOrdersPage";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
+import { AdminCategoriesPage } from "@/pages/admin/AdminCategoriesPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -26,6 +27,15 @@ const ProductDetailsPage = lazy(() =>
   import("@/pages/ProductDetailsPage").then((m) => ({
     default: m.ProductDetailsPage,
   })),
+);
+const AccountPage = lazy(() =>
+  import("@/pages/AccountPage").then((m) => ({ default: m.AccountPage })),
+);
+const WishlistPage = lazy(() =>
+  import("@/pages/WishlistPage").then((m) => ({ default: m.WishlistPage })),
+);
+const OrdersPage = lazy(() =>
+  import("@/pages/OrdersPage").then((m) => ({ default: m.OrdersPage })),
 );
 
 export function App() {
@@ -46,6 +56,7 @@ export function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboardPage />} />
               <Route path="products" element={<AdminProductsPage />} />
+              <Route path="categories" element={<AdminCategoriesPage />} />
               <Route path="coupons" element={<AdminCouponsPage />} />
               <Route path="banners" element={<AdminBannersPage />} />
               <Route path="orders" element={<AdminOrdersPage />} />
@@ -55,6 +66,9 @@ export function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="login" element={<LoginPage />} />
+              <Route path="account" element={<AccountPage />} />
+              <Route path="wishlist" element={<WishlistPage />} />
+              <Route path="orders" element={<OrdersPage />} />
               <Route path="products" element={<ProductsPage />} />
               <Route path="products/:slug" element={<ProductDetailsPage />} />
               <Route path="categories" element={<CategoriesPage />} />

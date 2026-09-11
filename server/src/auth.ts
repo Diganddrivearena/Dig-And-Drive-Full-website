@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { eq } from "drizzle-orm";
 import { db } from "./db";
 import * as schema from "./db/schema";
 import { notifyNewAccount } from "./lib/fast2sms";
@@ -114,6 +115,31 @@ export const auth = betterAuth({
         required: false,
         input: true,
       },
+      addressLine1: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      addressLine2: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      city: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      state: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      pincode: {
+        type: "string",
+        required: false,
+        input: true,
+      },
     },
   },
   databaseHooks: {
@@ -122,7 +148,25 @@ export const auth = betterAuth({
         before: async (user) => {
           const email = (user.email ?? "").toLowerCase();
           const role = adminEmails().has(email) ? "admin" : "customer";
-          return { data: { ...user, role } };
+          const phoneRaw = (user as { phone?: string | null }).phone;
+          let phone = phoneRaw?.replace(/\D/g, "") || null;
+          if (phone && phone.length === 12 && phone.startsWith("91")) {
+            phone = phone.slice(2);
+          }
+          if (phone && (phone.length !== 10 || !/^[6-9]/.test(phone))) {
+            throw new Error("Enter a valid 10-digit Indian mobile number");
+          }
+          if (phone) {
+            const existing = await db
+              .select({ id: schema.user.id })
+              .from(schema.user)
+              .where(eq(schema.user.phone, phone))
+              .limit(1);
+            if (existing.length) {
+              throw new Error("This phone number is already registered");
+            }
+          }
+          return { data: { ...user, role, phone } };
         },
         after: async (user) => {
           void notifyNewAccount({

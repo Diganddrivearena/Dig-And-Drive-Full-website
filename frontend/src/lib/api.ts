@@ -66,6 +66,77 @@ export async function uploadBannerImage(file: File): Promise<string> {
   return res.url;
 }
 
+export async function uploadProductImage(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await api<{ url: string }>("/admin/products/upload", {
+    method: "POST",
+    body,
+  });
+  return res.url;
+}
+
+export async function uploadCategoryImage(file: File): Promise<string> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await api<{ url: string }>("/admin/categories/upload", {
+    method: "POST",
+    body,
+  });
+  return res.url;
+}
+
+export type ApiProfile = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  image: string | null;
+  role: string;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  city: string | null;
+  state: string | null;
+  pincode: string | null;
+};
+
+export type ApiCategory = {
+  id: string;
+  name: string;
+  description: string;
+  imageKey: string;
+  featured: boolean;
+};
+
+export type ApiReview = {
+  id: number;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  userName: string;
+  userId: string;
+};
+
+export type ApiOrder = {
+  id: number;
+  status: string;
+  subtotal: number;
+  discount: number;
+  total: number;
+  couponCode: string | null;
+  phone: string | null;
+  email: string | null;
+  createdAt: string;
+  items: {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    imageKey?: string;
+    image?: string;
+  }[];
+};
+
 export type ApiProduct = {
   id: number;
   name: string;

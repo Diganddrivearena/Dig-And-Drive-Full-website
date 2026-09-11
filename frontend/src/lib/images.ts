@@ -125,6 +125,15 @@ const slugToFolder: Record<string, string> = {
 };
 
 export function imageFor(key: string) {
+  if (!key) return placeholderImg;
+  if (
+    key.startsWith("http") ||
+    key.startsWith("/") ||
+    key.startsWith("data:") ||
+    key.startsWith("blob:")
+  ) {
+    return key;
+  }
   return productImages[key] ?? placeholderImg;
 }
 

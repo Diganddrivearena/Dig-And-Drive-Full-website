@@ -67,6 +67,9 @@ checkoutRoutes.post("/create-order", requireAuth, async (c) => {
     if (!product || !product.active) {
       return c.json({ error: `Product ${item.productId} unavailable` }, 400);
     }
+    if (!product.inStock) {
+      return c.json({ error: `${product.name} is out of stock` }, 400);
+    }
     lineItems.push({
       productId: product.id,
       name: product.name,

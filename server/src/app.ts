@@ -9,6 +9,11 @@ import { bannersRoutes } from "./routes/banners";
 import { couponsRoutes } from "./routes/coupons";
 import { adminRoutes } from "./routes/admin";
 import { checkoutRoutes } from "./routes/checkout";
+import { meRoutes } from "./routes/me";
+import { ordersRoutes } from "./routes/orders";
+import { wishlistRoutes } from "./routes/wishlist";
+import { reviewsRoutes } from "./routes/reviews";
+import { categoriesRoutes } from "./routes/categories";
 
 function adminEmails(): Set<string> {
   return new Set(
@@ -70,7 +75,12 @@ app.get("/health", (c) => c.json({ ok: true }));
 app.route("/products", productsRoutes);
 app.route("/banners", bannersRoutes);
 app.route("/coupons", couponsRoutes);
+app.route("/categories", categoriesRoutes);
 app.route("/admin", adminRoutes);
 app.route("/checkout", checkoutRoutes);
+app.route("/me", meRoutes);
+app.route("/orders", ordersRoutes);
+app.route("/wishlist", wishlistRoutes);
+app.route("/reviews", reviewsRoutes);
 
 export default app;

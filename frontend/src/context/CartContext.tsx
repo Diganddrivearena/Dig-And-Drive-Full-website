@@ -9,6 +9,7 @@ export type Product = {
   image: string;
   description: string;
   slug: string;
+  inStock?: boolean;
 };
 
 export type CartItem = {
@@ -42,6 +43,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [cart]);
 
   const addToCart = (product: Product, quantity = 1) => {
+    if (product.inStock === false) {
+      return;
+    }
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
@@ -53,7 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { product, quantity }];
     });
-    setIsOpen(true); // Auto-open drawer when adding item
+    setIsOpen(true);
   };
 
   const removeFromCart = (productId: number) => {

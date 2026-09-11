@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
-import { LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { GoogleIcon } from "@/components/GoogleIcon";
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +10,7 @@ export function LoginPage() {
     user,
     isPending,
     signInWithGoogle,
-    signInWithEmail,
+    signInWithIdentifier,
     signUpWithEmail,
   } = useAuth();
   const [params] = useSearchParams();
@@ -18,8 +18,10 @@ export function LoginPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   if (isPending) {
@@ -48,9 +50,11 @@ export function LoginPage() {
           throw new Error("Enter a valid 10-digit mobile number for SMS");
         }
         await signUpWithEmail(name, email, password, digits);
-        toast.success("Account created. A welcome SMS will be sent to your mobile.");
+        toast.success(
+          "Account created. A welcome SMS will be sent to your mobile.",
+        );
       } else {
-        await signInWithEmail(email, password);
+        await signInWithIdentifier(identifier, password);
         toast.success("Logged in");
       }
     } catch (err) {
@@ -69,8 +73,8 @@ export function LoginPage() {
           </h1>
           <p className="text-sm text-muted-foreground">
             {mode === "register"
-              ? "Register with email or Google to checkout faster."
-              : "Login with email & password or Google."}
+              ? "Register with email, phone and password — or Google."
+              : "Login with email or phone number + password."}
           </p>
         </div>
 
@@ -85,37 +89,66 @@ export function LoginPage() {
               required
             />
           )}
-          <input
-            className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-          {mode === "register" && (
+          {mode === "register" ? (
+            <>
+              <input
+                className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+              <input
+                className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+                type="tel"
+                inputMode="numeric"
+                placeholder="10-digit mobile (for SMS)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+                required
+              />
+            </>
+          ) : (
             <input
               className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-              type="tel"
-              inputMode="numeric"
-              placeholder="10-digit mobile (for SMS)"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
+              placeholder="Email or phone number"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              autoComplete="username"
               required
             />
           )}
-          <input
-            className="w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-            type="password"
-            placeholder={mode === "register" ? "Password (min 8 characters)" : "Password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === "register" ? "new-password" : "current-password"}
-            minLength={8}
-            required
-          />
+          <div className="relative">
+            <input
+              className="w-full border rounded-lg px-3 py-2.5 pr-11 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+              type={showPassword ? "text" : "password"}
+              placeholder={
+                mode === "register" ? "Password (min 8 characters)" : "Password"
+              }
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={
+                mode === "register" ? "new-password" : "current-password"
+              }
+              minLength={8}
+              required
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand-black"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
           <button
             type="submit"
             className="btn-yellow w-full justify-center"
@@ -154,7 +187,10 @@ export function LoginPage() {
           {mode === "register" ? (
             <>
               Already have an account?{" "}
-              <Link to="/login" className="text-brand-orange font-semibold hover:underline">
+              <Link
+                to="/login"
+                className="text-brand-orange font-semibold hover:underline"
+              >
                 Login
               </Link>
             </>
