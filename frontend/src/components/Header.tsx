@@ -68,9 +68,13 @@ export function Header() {
         </div>
       </div>
 
-      <div className="bg-white/95 backdrop-blur border-b border-border">
-        <div className="container-x flex items-center justify-between gap-2 py-2">
-          <Link to="/" className="flex items-center gap-2" aria-label="DIG & DRIVE ARENA home">
+      <div className="relative bg-white/95 backdrop-blur border-b border-border">
+        <div className="container-x flex items-center justify-between gap-1 sm:gap-2 py-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2 min-w-0 shrink"
+            aria-label="DIG & DRIVE ARENA home"
+          >
             <img
               src={logo}
               alt="DIG & DRIVE ARENA"
@@ -81,9 +85,9 @@ export function Header() {
               decoding="async"
               className="h-9 w-9 sm:h-11 sm:w-11 object-contain flex-shrink-0"
             />
-            <div className="leading-tight min-w-0">
+            <div className="leading-tight min-w-0 hidden sm:block">
               <div className="font-display text-base sm:text-xl text-brand-black whitespace-nowrap">
-                DIG & DRIVE <span className="text-brand-orange">ARENA</span>
+                DIG &amp; DRIVE <span className="text-brand-orange">ARENA</span>
               </div>
               <div className="hidden sm:block text-[10px] uppercase tracking-[0.2em] text-brand-dark">
                 Dig, Drive and Play
@@ -105,7 +109,8 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Mobile/desktop actions: keep WhatsApp + menu always reachable */}
+          <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0">
             <HeaderSearch />
             <button
               onClick={() => setIsOpen(true)}
@@ -122,18 +127,18 @@ export function Header() {
 
             {!isPending &&
               (user ? (
-                <div className="flex items-center gap-1">
+                <div className="hidden md:flex items-center gap-1">
                   {isAdmin && (
                     <Link
                       to="/admin"
-                      className={`${navBtn} hidden sm:inline-flex border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white`}
+                      className={`${navBtn} border-2 border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white`}
                     >
                       Admin
                     </Link>
                   )}
                   <Link
                     to="/account"
-                    className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-brand-black max-w-[120px] truncate px-1 hover:text-brand-orange"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-black max-w-[120px] truncate px-1 hover:text-brand-orange"
                     title="My account"
                   >
                     <UserRound className="h-3.5 w-3.5 shrink-0" />
@@ -163,7 +168,7 @@ export function Header() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5">
+                <div className="hidden md:flex items-center gap-1.5">
                   <button
                     onClick={() => navigate("/login")}
                     className={`${navBtn} border-2 border-brand-black text-brand-black hover:bg-brand-black hover:text-white`}
@@ -183,14 +188,15 @@ export function Header() {
               href={waLink("Hello DIG & DRIVE ARENA, I have a query.")}
               target="_blank"
               rel="noopener noreferrer"
-              className={`${navBtn} bg-[#25D366] text-white hover:bg-[#1ebe5b]`}
+              className={`${navBtn} shrink-0 bg-[#25D366] text-white hover:bg-[#1ebe5b] px-2.5 sm:px-3`}
+              aria-label="Chat on WhatsApp"
             >
               <WhatsAppIcon className="h-4 w-4" />
               <span className="hidden sm:inline">WhatsApp</span>
             </a>
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer"
+              className="lg:hidden p-2 text-brand-black hover:text-brand-orange transition-colors cursor-pointer shrink-0"
               aria-label="Toggle menu"
             >
               {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -206,15 +212,36 @@ export function Header() {
                   key={n.label}
                   to={n.href}
                   onClick={() => setOpen(false)}
-                  className={`py-3 text-sm font-semibold uppercase tracking-wide transition-colors border-b border-border last:border-0 hover:text-brand-orange ${
+                  className={`py-3 text-sm font-semibold uppercase tracking-wide transition-colors border-b border-border hover:text-brand-orange ${
                     isActive(n.href) ? "text-brand-orange" : "text-brand-black"
                   }`}
                 >
                   {n.label}
                 </Link>
               ))}
-              {user && (
+
+              <a
+                href={waLink("Hello DIG & DRIVE ARENA, I have a query.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 py-3 text-sm font-semibold border-b border-border text-[#128C7E]"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+                WhatsApp us
+              </a>
+
+              {user ? (
                 <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setOpen(false)}
+                      className="py-3 text-sm font-semibold border-b border-border text-brand-orange"
+                    >
+                      Admin
+                    </Link>
+                  )}
                   <Link
                     to="/account"
                     onClick={() => setOpen(false)}
@@ -236,9 +263,22 @@ export function Header() {
                   >
                     Wishlist
                   </Link>
+                  <div className="flex items-center justify-between gap-2 py-3">
+                    <span className="text-sm font-semibold truncate">
+                      {user.name || user.email}
+                    </span>
+                    <button
+                      className={`${navBtn} border-2 border-brand-black`}
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </>
-              )}
-              {!user ? (
+              ) : (
                 <div className="flex gap-2 py-3">
                   <button
                     className={`${navBtn} flex-1 border-2 border-brand-black`}
@@ -257,21 +297,6 @@ export function Header() {
                     }}
                   >
                     Register
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between gap-2 py-3">
-                  <span className="text-sm font-semibold truncate">
-                    {user.name || user.email}
-                  </span>
-                  <button
-                    className={`${navBtn} border-2 border-brand-black`}
-                    onClick={() => {
-                      setOpen(false);
-                      void signOut();
-                    }}
-                  >
-                    Logout
                   </button>
                 </div>
               )}

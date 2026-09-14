@@ -1,44 +1,91 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { api, type ApiProfile } from "@/lib/api";
+import { ApiError, api, type ApiProfile } from "@/lib/api";
+
+type ProfileForm = {
+  name: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  pincode: string;
+};
+
+function toForm(profile: ApiProfile): ProfileForm {
+  return {
+    name: profile.name ?? "",
+    phone: profile.phone ?? "",
+    addressLine1: profile.addressLine1 ?? "",
+    addressLine2: profile.addressLine2 ?? "",
+    city: profile.city ?? "",
+    state: profile.state ?? "",
+    pincode: profile.pincode ?? "",
+  };
+}
+
+function emptyToNull(value: string) {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
 
 export function AccountPage() {
   const { user, isPending, refreshSession } = useAuth();
   const qc = useQueryClient();
+  const [form, setForm] = useState<ProfileForm | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["me"],
     enabled: Boolean(user),
     queryFn: () => api<ApiProfile>("/me"),
   });
 
-  const [form, setForm] = useState<Partial<ApiProfile> | null>(null);
-  const values = form ?? data ?? null;
+  useEffect(() => {
+    if (data) setForm(toForm(data));
+  }, [data]);
 
   const save = useMutation({
-    mutationFn: () =>
-      api<ApiProfile>("/me", {
+    mutationFn: async () => {
+      if (!form) throw new Error("Profile not loaded");
+      if (!form.name.trim()) throw new Error("Name is required");
+
+      const phoneDigits = form.phone.replace(/\D/g, "");
+      if (phoneDigits && (phoneDigits.length !== 10 || !/^[6-9]/.test(phoneDigits))) {
+        throw new Error("Enter a valid 10-digit mobile number");
+      }
+
+      return api<ApiProfile>("/me", {
         method: "PATCH",
         body: JSON.stringify({
-          name: values?.name,
-          phone: values?.phone || null,
-          addressLine1: values?.addressLine1 || null,
-          addressLine2: values?.addressLine2 || null,
-          city: values?.city || null,
-          state: values?.state || null,
-          pincode: values?.pincode || null,
+          name: form.name.trim(),
+          phone: phoneDigits || null,
+          addressLine1: emptyToNull(form.addressLine1),
+          addressLine2: emptyToNull(form.addressLine2),
+          city: emptyToNull(form.city),
+          state: emptyToNull(form.state),
+          pincode: emptyToNull(form.pincode),
         }),
-      }),
+      });
+    },
     onSuccess: async (profile) => {
       toast.success("Profile saved");
-      setForm(null);
+      setForm(toForm(profile));
       qc.setQueryData(["me"], profile);
       await refreshSession();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      if (e instanceof ApiError && e.body && typeof e.body === "object") {
+        const body = e.body as { error?: unknown };
+        if (typeof body.error === "string") {
+          toast.error(body.error);
+          return;
+        }
+      }
+      toast.error(e.message || "Could not save profile");
+    },
   });
 
   if (isPending || isLoading) {
@@ -53,10 +100,15 @@ export function AccountPage() {
     return <Navigate to="/login" replace />;
   }
 
-  if (!values) {
+  if (isError || !form) {
     return (
-      <div className="container-x py-16 text-center text-muted-foreground">
-        Could not load profile.
+      <div className="container-x py-16 text-center">
+        <p className="text-muted-foreground mb-4">
+          {error instanceof Error ? error.message : "Could not load profile."}
+        </p>
+        <button type="button" className="btn-yellow" onClick={() => void refetch()}>
+          Try again
+        </button>
       </div>
     );
   }
@@ -67,7 +119,7 @@ export function AccountPage() {
   };
 
   const field = (
-    key: keyof ApiProfile,
+    key: keyof ProfileForm,
     label: string,
     opts?: { type?: string; required?: boolean },
   ) => (
@@ -77,12 +129,9 @@ export function AccountPage() {
         className="mt-1 w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
         type={opts?.type || "text"}
         required={opts?.required}
-        value={(values[key] as string | null) ?? ""}
+        value={form[key]}
         onChange={(e) =>
-          setForm({
-            ...values,
-            [key]: e.target.value,
-          })
+          setForm((prev) => (prev ? { ...prev, [key]: e.target.value } : prev))
         }
       />
     </label>
@@ -110,7 +159,8 @@ export function AccountPage() {
           className="rounded-2xl border border-border bg-white p-6 md:p-8 space-y-4 shadow-sm"
         >
           <p className="text-sm text-muted-foreground">
-            Signed in as <span className="font-semibold text-brand-black">{user.email}</span>
+            Signed in as{" "}
+            <span className="font-semibold text-brand-black">{user.email}</span>
           </p>
           {field("name", "Full name", { required: true })}
           {field("phone", "Phone (10 digits)", { type: "tel" })}
@@ -121,11 +171,7 @@ export function AccountPage() {
             {field("state", "State")}
           </div>
           {field("pincode", "PIN code")}
-          <button
-            type="submit"
-            className="btn-yellow"
-            disabled={save.isPending}
-          >
+          <button type="submit" className="btn-yellow" disabled={save.isPending}>
             {save.isPending ? "Saving…" : "Save profile"}
           </button>
         </form>

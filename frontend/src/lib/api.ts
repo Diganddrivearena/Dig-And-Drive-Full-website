@@ -44,12 +44,15 @@ export async function api<T>(
   }
 
   if (!res.ok) {
-    const message =
-      (data && typeof data === "object" && "error" in data
-        ? typeof data.error === "string"
-          ? data.error
-          : "Request failed"
-        : "Request failed") || "Request failed";
+    let message = "Request failed";
+    if (data && typeof data === "object" && "error" in data) {
+      const err = (data as { error: unknown }).error;
+      if (typeof err === "string") message = err;
+      else if (err && typeof err === "object" && "formErrors" in err) {
+        const flat = err as { formErrors?: string[] };
+        message = flat.formErrors?.[0] || message;
+      }
+    }
     throw new ApiError(message, res.status, data);
   }
 

@@ -342,32 +342,72 @@ async function saveUploadedImage(
   folder: string,
   prefix: string,
 ) {
-  if (!file || !(file instanceof File)) {
+  const isFileLike =
+    file != null &&
+    typeof file === "object" &&
+    typeof (file as File).arrayBuffer === "function" &&
+    typeof (file as File).type === "string" &&
+    typeof (file as File).size === "number";
+
+  if (!isFileLike) {
     return Response.json({ error: "file is required" }, { status: 400 });
   }
-  if (!file.type.startsWith("image/")) {
+
+  const upload = file as File;
+  if (!upload.type.startsWith("image/")) {
     return Response.json(
       { error: "Only image uploads are allowed" },
       { status: 400 },
     );
   }
-  if (file.size > 5 * 1024 * 1024) {
-    return Response.json({ error: "Image must be under 5MB" }, { status: 400 });
+  if (upload.size > 8 * 1024 * 1024) {
+    return Response.json({ error: "Image must be under 8MB" }, { status: 400 });
   }
 
   const ext =
-    file.type === "image/png"
+    upload.type === "image/png"
       ? "png"
-      : file.type === "image/webp"
+      : upload.type === "image/webp"
         ? "webp"
-        : file.type === "image/gif"
+        : upload.type === "image/gif"
           ? "gif"
           : "jpg";
   const name = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = resolve(process.cwd(), `../frontend/public/uploads/${folder}`);
-  await mkdir(dir, { recursive: true });
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(join(dir, name), bytes);
+
+  // Prefer UPLOAD_DIR (persistent on VPS). Fallbacks keep local/dev working
+  // and also write into frontend/dist so builds don't hide new files.
+  const roots = [
+    process.env.UPLOAD_DIR,
+    resolve(process.cwd(), "../uploads"),
+    resolve(process.cwd(), "../frontend/public/uploads"),
+    resolve(process.cwd(), "../frontend/dist/uploads"),
+  ].filter((p): p is string => Boolean(p));
+
+  const uniqueRoots = [...new Set(roots.map((p) => resolve(p)))];
+  const bytes = Buffer.from(await upload.arrayBuffer());
+  let wrote = false;
+  const errors: string[] = [];
+
+  for (const root of uniqueRoots) {
+    try {
+      const dir = join(root, folder);
+      await mkdir(dir, { recursive: true });
+      await writeFile(join(dir, name), bytes);
+      wrote = true;
+    } catch (err) {
+      errors.push(
+        `${root}: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  if (!wrote) {
+    console.error("[upload] failed to write", errors);
+    return Response.json(
+      { error: "Could not save upload on server" },
+      { status: 500 },
+    );
+  }
 
   return Response.json({ url: `/uploads/${folder}/${name}` });
 }

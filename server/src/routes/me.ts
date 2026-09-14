@@ -35,19 +35,21 @@ meRoutes.get("/", requireAuth, async (c) => {
 
 const profileSchema = z.object({
   name: z.string().min(1).optional(),
-  phone: z.string().min(10).max(15).nullable().optional(),
-  addressLine1: z.string().max(200).nullable().optional(),
-  addressLine2: z.string().max(200).nullable().optional(),
-  city: z.string().max(100).nullable().optional(),
-  state: z.string().max(100).nullable().optional(),
-  pincode: z.string().max(12).nullable().optional(),
+  phone: z
+    .union([z.string().max(20), z.literal(""), z.null()])
+    .optional(),
+  addressLine1: z.union([z.string().max(200), z.null()]).optional(),
+  addressLine2: z.union([z.string().max(200), z.null()]).optional(),
+  city: z.union([z.string().max(100), z.null()]).optional(),
+  state: z.union([z.string().max(100), z.null()]).optional(),
+  pincode: z.union([z.string().max(12), z.null()]).optional(),
 });
 
 meRoutes.patch("/", requireAuth, async (c) => {
   const sessionUser = c.get("user")!;
   const parsed = profileSchema.safeParse(await c.req.json());
   if (!parsed.success) {
-    return c.json({ error: parsed.error.flatten() }, 400);
+    return c.json({ error: "Invalid profile data" }, 400);
   }
   const data = parsed.data;
 
@@ -71,20 +73,29 @@ meRoutes.patch("/", requireAuth, async (c) => {
     }
   }
 
+  const clean = (value: string | null | undefined) => {
+    if (value === undefined) return undefined;
+    if (value === null) return null;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  };
+
   const [row] = await db
     .update(userTable)
     .set({
       ...(data.name !== undefined ? { name: data.name.trim() } : {}),
       ...(phone !== undefined ? { phone } : {}),
       ...(data.addressLine1 !== undefined
-        ? { addressLine1: data.addressLine1 }
+        ? { addressLine1: clean(data.addressLine1) ?? null }
         : {}),
       ...(data.addressLine2 !== undefined
-        ? { addressLine2: data.addressLine2 }
+        ? { addressLine2: clean(data.addressLine2) ?? null }
         : {}),
-      ...(data.city !== undefined ? { city: data.city } : {}),
-      ...(data.state !== undefined ? { state: data.state } : {}),
-      ...(data.pincode !== undefined ? { pincode: data.pincode } : {}),
+      ...(data.city !== undefined ? { city: clean(data.city) ?? null } : {}),
+      ...(data.state !== undefined ? { state: clean(data.state) ?? null } : {}),
+      ...(data.pincode !== undefined
+        ? { pincode: clean(data.pincode) ?? null }
+        : {}),
       updatedAt: new Date(),
     })
     .where(eq(userTable.id, sessionUser.id))
