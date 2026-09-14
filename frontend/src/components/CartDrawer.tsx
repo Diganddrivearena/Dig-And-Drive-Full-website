@@ -1,5 +1,6 @@
 import { X, Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { imageFor } from "@/lib/images";
@@ -20,6 +21,7 @@ function toCheckoutPhone(raw: string | null | undefined): string {
 }
 
 export function CartDrawer() {
+  const navigate = useNavigate();
   const {
     cart,
     isOpen,
@@ -201,6 +203,7 @@ export function CartDrawer() {
                 ? "Payment successful. Your order is confirmed and a message was sent."
                 : "Payment successful. Your order is confirmed.",
             );
+            navigate("/orders");
           } catch (err) {
             toast.error(
               err instanceof Error

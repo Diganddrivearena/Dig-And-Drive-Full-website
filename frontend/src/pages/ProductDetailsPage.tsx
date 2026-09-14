@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useProduct, useProducts } from "@/hooks/useCatalog";
-import { api, type ApiReview } from "@/lib/api";
+import { api, discountPercent, type ApiReview } from "@/lib/api";
 
 export function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -59,6 +59,10 @@ export function ProductDetailsPage() {
     ? wishlistRows.some((r) => r.productId === product.id)
     : false;
   const inStock = product?.inStock !== false;
+  const stockQty = Number(product?.stockQty ?? 0);
+  const off = product
+    ? discountPercent(product.price, product.originalPrice)
+    : null;
 
   const toggleWish = useMutation({
     mutationFn: async () => {
@@ -128,7 +132,16 @@ export function ProductDetailsPage() {
     .slice(0, 4);
 
   const specs: string[] = product.specs || [];
-  const allImages = [imageFor(product.image), ...getExtraImages(product.image)];
+  const galleryKeys =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
+  const allImages = [
+    ...galleryKeys.map((key) => imageFor(key)),
+    ...getExtraImages(product.image).filter(
+      (url) => !galleryKeys.map((k) => imageFor(k)).includes(url),
+    ),
+  ].filter((url, i, arr) => arr.indexOf(url) === i);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -310,23 +323,33 @@ export function ProductDetailsPage() {
                 </div>
               )}
 
-              <div className="mt-4 flex items-baseline gap-2">
+              <div className="mt-4 flex flex-wrap items-baseline gap-2">
                 <span className="text-3xl font-display text-brand-black">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
-                {product.originalPrice && (
-                  <span className="text-lg text-muted-foreground line-through">
-                    ₹{product.originalPrice.toLocaleString("en-IN")}
+                {product.originalPrice &&
+                  product.originalPrice > product.price && (
+                    <span className="text-lg text-muted-foreground line-through">
+                      ₹{product.originalPrice.toLocaleString("en-IN")}
+                    </span>
+                  )}
+                {off !== null && (
+                  <span className="rounded bg-brand-orange px-2 py-0.5 text-sm font-bold text-white">
+                    {off}% OFF
                   </span>
                 )}
-                <span className="text-xs text-muted-foreground ml-2">
+                <span className="text-xs text-muted-foreground ml-1">
                   (Inclusive of all taxes)
                 </span>
               </div>
 
-              {!inStock && (
+              {!inStock ? (
                 <p className="mt-3 text-sm font-bold uppercase tracking-wide text-red-600">
                   Out of stock
+                </p>
+              ) : (
+                <p className="mt-3 text-sm font-semibold text-brand-black">
+                  {stockQty > 0 ? `${stockQty} in stock` : "In stock"}
                 </p>
               )}
 

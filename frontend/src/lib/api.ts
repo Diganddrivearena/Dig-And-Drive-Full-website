@@ -148,15 +148,26 @@ export type ApiProduct = {
   originalPrice?: number;
   category: string;
   image: string;
+  images?: string[];
   description: string;
   specs: string[];
   active?: boolean;
   featured?: boolean;
   bestSeller?: boolean;
   inStock?: boolean;
+  stockQty?: number;
   createdAt?: string;
   sortOrder?: number;
 };
+
+/** Percent off when originalPrice is higher than price; otherwise null. */
+export function discountPercent(
+  price: number,
+  originalPrice?: number | null,
+): number | null {
+  if (!originalPrice || originalPrice <= price) return null;
+  return Math.round(((originalPrice - price) / originalPrice) * 100);
+}
 
 export type ApiBanner = {
   id: number;

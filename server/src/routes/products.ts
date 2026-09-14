@@ -7,6 +7,12 @@ import type { AppVariables } from "../app";
 export const productsRoutes = new Hono<{ Variables: AppVariables }>();
 
 function mapProduct(p: typeof products.$inferSelect) {
+  const gallery = Array.isArray(p.galleryImages) ? p.galleryImages : [];
+  const images = [p.imageKey, ...gallery].filter(
+    (v, i, arr) => Boolean(v) && arr.indexOf(v) === i,
+  );
+  const stockQty = Number(p.stockQty ?? 0);
+  const inStock = p.inStock !== false && stockQty > 0;
   return {
     id: p.id,
     name: p.name,
@@ -15,12 +21,14 @@ function mapProduct(p: typeof products.$inferSelect) {
     originalPrice: p.originalPrice ?? undefined,
     category: p.category,
     image: p.imageKey,
+    images,
     description: p.description,
     specs: p.specs ?? [],
     active: p.active,
     featured: p.featured,
     bestSeller: p.bestSeller,
-    inStock: p.inStock,
+    inStock,
+    stockQty,
     sortOrder: p.sortOrder,
     createdAt: p.createdAt?.toISOString?.() ?? p.createdAt,
   };

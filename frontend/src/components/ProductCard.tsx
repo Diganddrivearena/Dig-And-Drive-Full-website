@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { imageFor } from "@/lib/images";
-import { api } from "@/lib/api";
+import { api, discountPercent } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 type Product = {
@@ -17,12 +17,15 @@ type Product = {
   description: string;
   slug: string;
   inStock?: boolean;
+  stockQty?: number;
 };
 
 export function ProductCard({ product }: { product: Product }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const inStock = product.inStock !== false;
+  const off = discountPercent(product.price, product.originalPrice);
+  const stockQty = Number(product.stockQty ?? 0);
 
   const { data: wishlist = [] } = useQuery({
     queryKey: ["wishlist"],
@@ -80,11 +83,20 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="absolute top-3 left-3 text-[10px] font-extrabold uppercase tracking-wider text-brand-yellow drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               {product.category}
             </span>
-            {!inStock && (
+            {off !== null && (
+              <span className="absolute top-3 right-14 rounded bg-brand-orange px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow">
+                {off}% OFF
+              </span>
+            )}
+            {!inStock ? (
               <span className="absolute bottom-3 left-3 rounded bg-brand-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
                 Out of stock
               </span>
-            )}
+            ) : stockQty > 0 ? (
+              <span className="absolute bottom-3 left-3 rounded bg-brand-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-brand-yellow">
+                {stockQty} in stock
+              </span>
+            ) : null}
           </div>
         </Link>
         <button
@@ -106,14 +118,17 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-sm text-muted-foreground line-clamp-2">
             {product.description}
           </p>
-          <div className="mt-auto pt-2 flex items-baseline gap-2">
+          <div className="mt-auto pt-2 flex flex-wrap items-baseline gap-2">
             <span className="text-2xl font-display text-brand-black">
               ₹{product.price.toLocaleString("en-IN")}
             </span>
-            {product.originalPrice && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-sm text-muted-foreground line-through">
                 ₹{product.originalPrice.toLocaleString("en-IN")}
               </span>
+            )}
+            {off !== null && (
+              <span className="text-sm font-bold text-brand-orange">{off}% off</span>
             )}
           </div>
         </div>

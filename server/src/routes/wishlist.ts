@@ -35,7 +35,9 @@ wishlistRoutes.get("/", requireAuth, async (c) => {
         originalPrice: r.product.originalPrice ?? undefined,
         category: r.product.category,
         image: r.product.imageKey,
-        inStock: r.product.inStock,
+        inStock:
+          r.product.inStock !== false && Number(r.product.stockQty ?? 0) > 0,
+        stockQty: Number(r.product.stockQty ?? 0),
         active: r.product.active,
       },
     })),

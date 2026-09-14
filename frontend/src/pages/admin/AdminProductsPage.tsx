@@ -25,11 +25,13 @@ import { toast } from "sonner";
 
 type AdminProduct = ApiProduct & {
   imageKey?: string;
+  galleryImages?: string[];
   active: boolean;
   sortOrder?: number;
   featured?: boolean;
   bestSeller?: boolean;
   inStock?: boolean;
+  stockQty?: number;
 };
 
 type ProductForm = {
@@ -39,12 +41,13 @@ type ProductForm = {
   originalPrice: number | "";
   category: string;
   imageKey: string;
+  galleryImages: string[];
   description: string;
   specsText: string;
   active: boolean;
   featured: boolean;
   bestSeller: boolean;
-  inStock: boolean;
+  stockQty: number;
 };
 
 const emptyForm: ProductForm = {
@@ -54,12 +57,13 @@ const emptyForm: ProductForm = {
   originalPrice: "",
   category: "",
   imageKey: productImageKeys[0] ?? "",
+  galleryImages: [],
   description: "",
   specsText: "",
   active: true,
   featured: false,
   bestSeller: false,
-  inStock: true,
+  stockQty: 10,
 };
 
 function slugify(s: string) {
@@ -142,6 +146,11 @@ function SortableRow({
         >
           {product.active ? "Active" : "Hidden"}
         </span>
+        <div className="mt-1 text-[11px] text-muted-foreground">
+          {Number(product.stockQty ?? 0) > 0
+            ? `${product.stockQty} in stock`
+            : "Out of stock"}
+        </div>
       </td>
       <td className="p-3">
         <div className="flex items-center gap-1">
@@ -196,14 +205,49 @@ export function AdminProductsPage() {
     setUploading(true);
     try {
       const url = await uploadProductImage(file);
-      setForm((f) => ({ ...f, imageKey: url }));
-      toast.success("Image uploaded");
+      setForm((f) => {
+        if (!f.imageKey) return { ...f, imageKey: url };
+        if (f.imageKey === url || f.galleryImages.includes(url)) return f;
+        return { ...f, galleryImages: [...f.galleryImages, url] };
+      });
+      toast.success("Image added");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
+  };
+
+  const allFormImages = [form.imageKey, ...form.galleryImages].filter(
+    (v, i, arr) => Boolean(v) && arr.indexOf(v) === i,
+  );
+
+  const removeImage = (key: string) => {
+    setForm((f) => {
+      if (f.imageKey === key) {
+        const [nextCover, ...rest] = f.galleryImages;
+        return {
+          ...f,
+          imageKey: nextCover ?? "",
+          galleryImages: rest,
+        };
+      }
+      return {
+        ...f,
+        galleryImages: f.galleryImages.filter((g) => g !== key),
+      };
+    });
+  };
+
+  const setAsCover = (key: string) => {
+    setForm((f) => {
+      if (f.imageKey === key) return f;
+      const others = [f.imageKey, ...f.galleryImages].filter(
+        (g) => g && g !== key,
+      );
+      return { ...f, imageKey: key, galleryImages: others };
+    });
   };
 
   const sensors = useSensors(
@@ -217,6 +261,7 @@ export function AdminProductsPage() {
 
   const save = useMutation({
     mutationFn: async () => {
+      if (!form.imageKey) throw new Error("Add at least one product image");
       const payload = {
         name: form.name,
         slug: form.slug || slugify(form.name),
@@ -224,6 +269,7 @@ export function AdminProductsPage() {
         originalPrice: form.originalPrice === "" ? null : Number(form.originalPrice),
         category: form.category,
         imageKey: form.imageKey,
+        galleryImages: form.galleryImages,
         description: form.description,
         specs: form.specsText
           .split("\n")
@@ -232,7 +278,8 @@ export function AdminProductsPage() {
         active: form.active,
         featured: form.featured,
         bestSeller: form.bestSeller,
-        inStock: form.inStock,
+        stockQty: Number(form.stockQty) || 0,
+        inStock: Number(form.stockQty) > 0,
       };
       if (editingId) {
         return api(`/admin/products/${editingId}`, {
@@ -284,6 +331,9 @@ export function AdminProductsPage() {
   });
 
   const startEdit = (p: AdminProduct) => {
+    const gallery =
+      p.galleryImages ??
+      (p.images || []).filter((img) => img !== (p.imageKey || p.image));
     setEditingId(p.id);
     setForm({
       name: p.name,
@@ -292,12 +342,13 @@ export function AdminProductsPage() {
       originalPrice: p.originalPrice ?? "",
       category: p.category,
       imageKey: p.imageKey || p.image,
+      galleryImages: gallery,
       description: p.description,
       specsText: (p.specs || []).join("\n"),
       active: p.active,
       featured: Boolean(p.featured),
       bestSeller: Boolean(p.bestSeller),
-      inStock: p.inStock !== false,
+      stockQty: Number(p.stockQty ?? (p.inStock === false ? 0 : 10)),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -393,86 +444,89 @@ export function AdminProductsPage() {
         <div className="md:col-span-2 rounded-xl border border-border bg-brand-gray/30 p-3">
           <div className="flex items-center gap-2 text-sm font-semibold mb-3">
             <ImageIcon className="h-4 w-4 text-brand-orange" />
-            Product image
+            Product images
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 items-start">
-            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-border bg-brand-black">
-              <img
-                src={imageFor(form.imageKey)}
-                alt="Preview"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="flex-1 w-full space-y-2">
-              <input
-                className="w-full border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-                placeholder="Image key or /uploads/products/…"
-                value={form.imageKey}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, imageKey: e.target.value }))
-                }
-                required
-              />
-              <div className="flex flex-wrap items-center gap-2">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif"
-                  className="hidden"
-                  onChange={(e) => onUpload(e.target.files?.[0])}
+          <p className="text-xs text-muted-foreground mb-3">
+            Upload adds another image (does not replace). First image is the cover.
+          </p>
+          <div className="flex flex-wrap gap-3 mb-3">
+            {allFormImages.map((key) => (
+              <div
+                key={key}
+                className="relative h-24 w-24 overflow-hidden rounded-lg border border-border bg-brand-black"
+              >
+                <img
+                  src={imageFor(key)}
+                  alt=""
+                  className="h-full w-full object-cover"
                 />
-                <button
-                  type="button"
-                  disabled={uploading}
-                  onClick={() => fileRef.current?.click()}
-                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-semibold hover:border-brand-orange hover:bg-brand-orange/5 transition-colors disabled:opacity-60"
-                >
-                  <Upload className="h-4 w-4" />
-                  {uploading ? "Uploading…" : "Upload image"}
-                </button>
-                <select
-                  className="border rounded-lg px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
-                  value={
-                    productImageKeys.includes(form.imageKey) ? form.imageKey : ""
-                  }
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setForm((f) => ({ ...f, imageKey: e.target.value }));
-                    }
-                  }}
-                >
-                  <option value="">Or pick bundled asset…</option>
-                  {productImageKeys.map((key) => (
-                    <option key={key} value={key}>
-                      {key}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
-                {productImageKeys.slice(0, 24).map((key) => (
+                {key === form.imageKey && (
+                  <span className="absolute left-1 top-1 rounded bg-brand-yellow px-1.5 py-0.5 text-[9px] font-bold uppercase text-brand-black">
+                    Cover
+                  </span>
+                )}
+                <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-black/70 p-1">
+                  {key !== form.imageKey && (
+                    <button
+                      type="button"
+                      onClick={() => setAsCover(key)}
+                      className="flex-1 text-[9px] font-semibold text-white hover:text-brand-yellow"
+                    >
+                      Cover
+                    </button>
+                  )}
                   <button
-                    key={key}
                     type="button"
-                    onClick={() => setForm((f) => ({ ...f, imageKey: key }))}
-                    className={`h-12 w-12 overflow-hidden rounded-md border-2 transition-all hover:scale-105 ${
-                      form.imageKey === key
-                        ? "border-brand-orange ring-2 ring-brand-orange/30"
-                        : "border-transparent opacity-80 hover:opacity-100"
-                    }`}
-                    title={key}
+                    onClick={() => removeImage(key)}
+                    className="flex-1 text-[9px] font-semibold text-red-300 hover:text-red-200"
                   >
-                    <img
-                      src={imageFor(key)}
-                      alt={key}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
+                    Remove
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={(e) => onUpload(e.target.files?.[0])}
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileRef.current?.click()}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-sm font-semibold hover:border-brand-orange hover:bg-brand-orange/5 transition-colors disabled:opacity-60"
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? "Uploading…" : "Add image"}
+            </button>
+            <select
+              className="border rounded-lg px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
+              value=""
+              onChange={(e) => {
+                const key = e.target.value;
+                if (!key) return;
+                setForm((f) => {
+                  if (!f.imageKey) return { ...f, imageKey: key };
+                  if (f.imageKey === key || f.galleryImages.includes(key)) return f;
+                  return { ...f, galleryImages: [...f.galleryImages, key] };
+                });
+              }}
+            >
+              <option value="">Or add bundled asset…</option>
+              {productImageKeys.map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
+          </div>
+          {!form.imageKey && (
+            <p className="mt-2 text-xs text-red-600">Cover image is required.</p>
+          )}
         </div>
 
         <textarea
@@ -514,12 +568,16 @@ export function AdminProductsPage() {
           Best Seller
         </label>
         <label className="flex items-center gap-2 text-sm">
+          In stock qty
           <input
-            type="checkbox"
-            checked={form.inStock}
-            onChange={(e) => setForm((f) => ({ ...f, inStock: e.target.checked }))}
+            type="number"
+            min={0}
+            className="w-24 border rounded-lg px-2 py-1"
+            value={form.stockQty}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, stockQty: Math.max(0, Number(e.target.value) || 0) }))
+            }
           />
-          In Stock
         </label>
         <div className="md:col-span-2 flex gap-2">
           <button type="submit" className="btn-yellow" disabled={save.isPending}>

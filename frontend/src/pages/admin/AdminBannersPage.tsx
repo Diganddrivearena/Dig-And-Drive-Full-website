@@ -275,6 +275,7 @@ export function AdminBannersPage() {
         <h1 className="font-display text-3xl">Banners</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Upload a new image, paste a URL, or pick a store asset. Drag cards to reorder.
+          Recommended size: <strong>1920 × 820 px</strong> (≈21:9 landscape). JPG or WebP under 2&nbsp;MB shows best without cropping.
         </p>
       </div>
 

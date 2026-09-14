@@ -28,12 +28,14 @@ const productSchema = z.object({
   originalPrice: z.number().int().positive().nullable().optional(),
   category: z.string().min(1),
   imageKey: z.string().min(1),
+  galleryImages: z.array(z.string()).optional().default([]),
   description: z.string().optional().default(""),
   specs: z.array(z.string()).optional().default([]),
   active: z.boolean().optional().default(true),
   featured: z.boolean().optional().default(false),
   bestSeller: z.boolean().optional().default(false),
   inStock: z.boolean().optional().default(true),
+  stockQty: z.number().int().nonnegative().optional().default(0),
 });
 
 adminRoutes.get("/products", async (c) => {
@@ -42,24 +44,32 @@ adminRoutes.get("/products", async (c) => {
     .from(products)
     .orderBy(asc(products.sortOrder), asc(products.id));
   return c.json(
-    rows.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      price: p.price,
-      originalPrice: p.originalPrice,
-      category: p.category,
-      image: p.imageKey,
-      imageKey: p.imageKey,
-      description: p.description,
-      specs: p.specs ?? [],
-      active: p.active,
-      featured: p.featured,
-      bestSeller: p.bestSeller,
-      inStock: p.inStock,
-      sortOrder: p.sortOrder,
-      createdAt: p.createdAt,
-    })),
+    rows.map((p) => {
+      const gallery = Array.isArray(p.galleryImages) ? p.galleryImages : [];
+      return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        category: p.category,
+        image: p.imageKey,
+        imageKey: p.imageKey,
+        galleryImages: gallery,
+        images: [p.imageKey, ...gallery].filter(
+          (v, i, arr) => Boolean(v) && arr.indexOf(v) === i,
+        ),
+        description: p.description,
+        specs: p.specs ?? [],
+        active: p.active,
+        featured: p.featured,
+        bestSeller: p.bestSeller,
+        inStock: p.inStock,
+        stockQty: p.stockQty ?? 0,
+        sortOrder: p.sortOrder,
+        createdAt: p.createdAt,
+      };
+    }),
   );
 });
 
@@ -98,6 +108,9 @@ adminRoutes.post("/products", async (c) => {
       return [{ max: -1 }];
     });
 
+  const stockQty = data.stockQty ?? 0;
+  const inStock = data.inStock !== undefined ? data.inStock && stockQty > 0 : stockQty > 0;
+
   const [row] = await db
     .insert(products)
     .values({
@@ -107,12 +120,14 @@ adminRoutes.post("/products", async (c) => {
       originalPrice: data.originalPrice ?? null,
       category: data.category,
       imageKey: data.imageKey,
+      galleryImages: data.galleryImages ?? [],
       description: data.description,
       specs: data.specs,
       active: data.active,
       featured: data.featured,
       bestSeller: data.bestSeller,
-      inStock: data.inStock,
+      inStock,
+      stockQty,
       sortOrder: (max ?? -1) + 1,
       updatedAt: new Date(),
     })
@@ -127,6 +142,12 @@ adminRoutes.patch("/products/:id", async (c) => {
     return c.json({ error: parsed.error.flatten() }, 400);
   }
   const data = parsed.data;
+
+  let inStock = data.inStock;
+  if (data.stockQty !== undefined) {
+    inStock = data.stockQty > 0 && (data.inStock ?? true);
+  }
+
   const [row] = await db
     .update(products)
     .set({
@@ -138,12 +159,16 @@ adminRoutes.patch("/products/:id", async (c) => {
         : {}),
       ...(data.category !== undefined ? { category: data.category } : {}),
       ...(data.imageKey !== undefined ? { imageKey: data.imageKey } : {}),
+      ...(data.galleryImages !== undefined
+        ? { galleryImages: data.galleryImages }
+        : {}),
       ...(data.description !== undefined ? { description: data.description } : {}),
       ...(data.specs !== undefined ? { specs: data.specs } : {}),
       ...(data.active !== undefined ? { active: data.active } : {}),
       ...(data.featured !== undefined ? { featured: data.featured } : {}),
       ...(data.bestSeller !== undefined ? { bestSeller: data.bestSeller } : {}),
-      ...(data.inStock !== undefined ? { inStock: data.inStock } : {}),
+      ...(data.stockQty !== undefined ? { stockQty: data.stockQty } : {}),
+      ...(inStock !== undefined ? { inStock } : {}),
       updatedAt: new Date(),
     })
     .where(eq(products.id, id))

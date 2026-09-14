@@ -67,8 +67,16 @@ checkoutRoutes.post("/create-order", requireAuth, async (c) => {
     if (!product || !product.active) {
       return c.json({ error: `Product ${item.productId} unavailable` }, 400);
     }
-    if (!product.inStock) {
+    if (!product.inStock || Number(product.stockQty ?? 0) <= 0) {
       return c.json({ error: `${product.name} is out of stock` }, 400);
+    }
+    if (item.quantity > Number(product.stockQty ?? 0)) {
+      return c.json(
+        {
+          error: `${product.name} only has ${product.stockQty} left in stock`,
+        },
+        400,
+      );
     }
     lineItems.push({
       productId: product.id,

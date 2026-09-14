@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useBanners } from "@/hooks/useCatalog";
 import { imageFor, placeholderImg } from "@/lib/images";
 import type { ApiBanner } from "@/lib/api";
-import { SITE } from "@/lib/site";
 
 type Slide = {
   id: string;
-  title: string;
-  subtitle: string;
   href: string;
   image: string;
 };
@@ -27,8 +24,6 @@ function buildSlides(banners: ApiBanner[]): Slide[] {
   if (banners.length) {
     return banners.map((b) => ({
       id: `banner-${b.id}`,
-      title: b.title,
-      subtitle: b.subtitle || SITE.tagline,
       href: b.linkUrl || "/products",
       image: bannerSrc(b.imageUrl),
     }));
@@ -36,15 +31,13 @@ function buildSlides(banners: ApiBanner[]): Slide[] {
   return [
     {
       id: "fallback",
-      title: SITE.name,
-      subtitle: SITE.tagline,
       href: "/products",
       image: "/firstsection.webp",
     },
   ];
 }
 
-/** Full-bleed hero carousel driven by admin banners. */
+/** Full-bleed hero carousel — image only (no title/subtitle overlay). */
 export function RotatingPromoBanner() {
   const { data: banners = [], isLoading } = useBanners();
   const slides = useMemo(() => buildSlides(banners), [banners]);
@@ -64,7 +57,7 @@ export function RotatingPromoBanner() {
 
   if (isLoading) {
     return (
-      <section className="relative bg-brand-black text-white min-h-[70vh] md:min-h-[85vh] grid place-items-center">
+      <section className="relative bg-brand-black text-white aspect-[21/9] min-h-[42vh] max-h-[85vh] grid place-items-center">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-yellow border-t-transparent" />
       </section>
     );
@@ -76,8 +69,8 @@ export function RotatingPromoBanner() {
   };
 
   return (
-    <section className="relative bg-brand-black text-white overflow-hidden">
-      <div className="relative min-h-[70vh] md:min-h-[85vh]">
+    <section className="relative bg-brand-black overflow-hidden">
+      <div className="relative aspect-[21/9] w-full min-h-[42vh] max-h-[85vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.id}
@@ -87,39 +80,15 @@ export function RotatingPromoBanner() {
             transition={{ duration: 0.55 }}
             className="absolute inset-0"
           >
-            <img
-              src={slide.image}
-              alt=""
-              className="h-full w-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-black via-brand-black/70 to-brand-black/25" />
+            <Link to={slide.href} className="absolute inset-0 block" aria-label="Shop now">
+              <img
+                src={slide.image}
+                alt=""
+                className="h-full w-full object-contain"
+              />
+            </Link>
           </motion.div>
         </AnimatePresence>
-
-        <div className="container-x relative z-10 flex min-h-[70vh] md:min-h-[85vh] items-center py-16">
-          <div className="max-w-2xl">
-            <span className="chip bg-brand-orange text-white">DIG &amp; DRIVE ARENA</span>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={slide.id + "-copy"}
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.4 }}
-              >
-                <h1 className="mt-4 font-display text-4xl md:text-7xl leading-tight">
-                  {slide.title}
-                </h1>
-                <p className="mt-4 text-white/80 text-lg md:text-xl max-w-xl">
-                  {slide.subtitle}
-                </p>
-                <Link to={slide.href} className="btn-yellow mt-8 inline-flex text-base px-8 py-3.5">
-                  Shop now <ArrowRight className="h-5 w-5" />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
 
         {slides.length > 1 && (
           <>
@@ -139,7 +108,7 @@ export function RotatingPromoBanner() {
             >
               <ChevronRight className="h-5 w-5" />
             </button>
-            <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
+            <div className="absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
               {slides.map((s, i) => (
                 <button
                   key={s.id}
