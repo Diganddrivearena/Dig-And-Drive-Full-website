@@ -33,9 +33,10 @@ function emptyToNull(value: string) {
 }
 
 export function AccountPage() {
-  const { user, isPending, refreshSession } = useAuth();
+  const { user, isPending } = useAuth();
   const qc = useQueryClient();
   const [form, setForm] = useState<ProfileForm | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["me"],
@@ -43,38 +44,44 @@ export function AccountPage() {
     queryFn: () => api<ApiProfile>("/me"),
   });
 
+  // Only hydrate from server when the user hasn't started editing.
+  // Previously every refetch reset the form and wiped typed address fields.
   useEffect(() => {
-    if (data) setForm(toForm(data));
-  }, [data]);
+    if (!data || dirty) return;
+    setForm(toForm(data));
+  }, [data, dirty]);
 
   const save = useMutation({
-    mutationFn: async () => {
-      if (!form) throw new Error("Profile not loaded");
-      if (!form.name.trim()) throw new Error("Name is required");
+    mutationFn: async (values: ProfileForm) => {
+      if (!values.name.trim()) throw new Error("Name is required");
 
-      const phoneDigits = form.phone.replace(/\D/g, "");
-      if (phoneDigits && (phoneDigits.length !== 10 || !/^[6-9]/.test(phoneDigits))) {
+      const phoneDigits = values.phone.replace(/\D/g, "");
+      if (
+        phoneDigits &&
+        (phoneDigits.length !== 10 || !/^[6-9]/.test(phoneDigits))
+      ) {
         throw new Error("Enter a valid 10-digit mobile number");
       }
 
       return api<ApiProfile>("/me", {
         method: "PATCH",
         body: JSON.stringify({
-          name: form.name.trim(),
+          name: values.name.trim(),
           phone: phoneDigits || null,
-          addressLine1: emptyToNull(form.addressLine1),
-          addressLine2: emptyToNull(form.addressLine2),
-          city: emptyToNull(form.city),
-          state: emptyToNull(form.state),
-          pincode: emptyToNull(form.pincode),
+          addressLine1: emptyToNull(values.addressLine1),
+          addressLine2: emptyToNull(values.addressLine2),
+          city: emptyToNull(values.city),
+          state: emptyToNull(values.state),
+          pincode: emptyToNull(values.pincode),
         }),
       });
     },
-    onSuccess: async (profile) => {
-      toast.success("Profile saved");
-      setForm(toForm(profile));
+    onSuccess: (profile) => {
+      const next = toForm(profile);
+      setForm(next);
+      setDirty(false);
       qc.setQueryData(["me"], profile);
-      await refreshSession();
+      toast.success("Profile saved");
     },
     onError: (e: Error) => {
       if (e instanceof ApiError && e.body && typeof e.body === "object") {
@@ -100,22 +107,40 @@ export function AccountPage() {
     return <Navigate to="/login" replace />;
   }
 
-  if (isError || !form) {
+  if (isError) {
     return (
       <div className="container-x py-16 text-center">
         <p className="text-muted-foreground mb-4">
           {error instanceof Error ? error.message : "Could not load profile."}
         </p>
-        <button type="button" className="btn-yellow" onClick={() => void refetch()}>
+        <button
+          type="button"
+          className="btn-yellow"
+          onClick={() => void refetch()}
+        >
           Try again
         </button>
       </div>
     );
   }
 
+  const values = form ?? (data ? toForm(data) : null);
+  if (!values) {
+    return (
+      <div className="container-x py-16 text-center text-muted-foreground">
+        Could not load profile.
+      </div>
+    );
+  }
+
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    save.mutate();
+    save.mutate(values);
+  };
+
+  const updateField = (key: keyof ProfileForm, value: string) => {
+    setDirty(true);
+    setForm((prev) => ({ ...(prev ?? values), [key]: value }));
   };
 
   const field = (
@@ -129,10 +154,8 @@ export function AccountPage() {
         className="mt-1 w-full border rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/40"
         type={opts?.type || "text"}
         required={opts?.required}
-        value={form[key]}
-        onChange={(e) =>
-          setForm((prev) => (prev ? { ...prev, [key]: e.target.value } : prev))
-        }
+        value={values[key]}
+        onChange={(e) => updateField(key, e.target.value)}
       />
     </label>
   );
@@ -145,11 +168,17 @@ export function AccountPage() {
         </h1>
         <p className="text-sm text-muted-foreground mb-8">
           Update your profile and delivery address.{" "}
-          <Link to="/orders" className="text-brand-orange font-semibold hover:underline">
+          <Link
+            to="/orders"
+            className="text-brand-orange font-semibold hover:underline"
+          >
             View orders
           </Link>{" "}
           ·{" "}
-          <Link to="/wishlist" className="text-brand-orange font-semibold hover:underline">
+          <Link
+            to="/wishlist"
+            className="text-brand-orange font-semibold hover:underline"
+          >
             Wishlist
           </Link>
         </p>
@@ -171,9 +200,18 @@ export function AccountPage() {
             {field("state", "State")}
           </div>
           {field("pincode", "PIN code")}
-          <button type="submit" className="btn-yellow" disabled={save.isPending}>
+          <button
+            type="submit"
+            className="btn-yellow"
+            disabled={save.isPending}
+          >
             {save.isPending ? "Saving…" : "Save profile"}
           </button>
+          {dirty && !save.isPending && (
+            <p className="text-xs text-muted-foreground">
+              You have unsaved changes.
+            </p>
+          )}
         </form>
       </div>
     </div>
